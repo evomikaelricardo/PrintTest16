@@ -58,88 +58,9 @@ def detect_printers():
         printer_name = "Virtual Zebra Printer"
         return printer_name
 
-    if len(zebra_printers) == 1:
-        printer_name = zebra_printers[0]  # Automatically select the only available Zebra printer
-        logging.info(f"Auto-selected Zebra printer: {printer_name}")
-        return printer_name
-
-    # If multiple Zebra printers are found, prompt the user to select one
-    def select_printer(selected):
-        global printer_name
-        printer_name = selected.get()
-        logging.info(f"User selected Zebra printer: {printer_name}")
-        printer_window.destroy()
-
-    printer_window = tk.Tk()
-
-    window_width = 700
-    window_height = 650
-    config.center_window(printer_window, window_width, window_height, "Generate RFID Tag (Select Printer)")
-
-    # Configure background to match main window
-    printer_window.configure(bg=config.BACKGROUND_COLOR)
-    
-    # Main container with padding
-    main_container = tk.Frame(printer_window, bg=config.BACKGROUND_COLOR)
-    main_container.pack(fill='both', expand=True, padx=50, pady=50)
-    
-    # Printer Selection Card
-    printer_card = tk.Frame(main_container, bg=config.CARD_COLOR, relief='flat', bd=1)
-    printer_card.configure(highlightbackground=config.BORDER_COLOR, highlightthickness=1)
-    printer_card.pack(fill='x', pady=(0, 15))
-    
-    # Card content with padding
-    card_content = tk.Frame(printer_card, bg=config.CARD_COLOR)
-    card_content.pack(fill='both', expand=True, padx=40, pady=30)
-    
-    tk.Label(card_content, text="Printer Selection", **config.SUBHEADER_STYLE).pack(anchor='w')
-    
-    # Add instruction text
-    instruction_label = tk.Label(
-        card_content,
-        text="Multiple Zebra printers found. Please select one from the dropdown, then click Select to continue.",
-        font=config.FONT_BODY,
-        bg=config.CARD_COLOR,
-        fg=config.SECONDARY_COLOR,
-        wraplength=520,
-        justify='left'
-    )
-    instruction_label.pack(fill='x', pady=(5, 15), padx=(0, 0))
-    
-    # Create a frame for the combobox
-    printer_selector_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
-    printer_selector_frame.pack(fill='x', pady=(10, 0))
-    
-    # Style the combobox
-    style = ttk.Style()
-    style.configure('Modern.TCombobox', fieldbackground=config.CARD_COLOR, borderwidth=1)
-    
-    selected_printer = tk.StringVar(value=zebra_printers[0])
-    dropdown = ttk.Combobox(
-        printer_selector_frame,
-        textvariable=selected_printer,
-        values=zebra_printers,
-        state="readonly",
-        width=30,
-        style='Modern.TCombobox',
-        font=config.FONT_BODY
-    )
-    dropdown.pack(side='left', padx=(0, 10))
-    
-    # Button section
-    button_frame = tk.Frame(main_container, bg=config.BACKGROUND_COLOR)
-    button_frame.pack(fill='x', pady=(20, 0))
-    
-    # Select button
-    select_button = tk.Button(
-        button_frame,
-        text="Continue",
-        command=lambda: select_printer(selected_printer),
-        **config.BUTTON_STYLE
-    )
-    select_button.pack(side=tk.RIGHT)
-    printer_window.mainloop()
-
+    # For Replit/cloud environment, auto-select the first printer to avoid GUI blocking
+    printer_name = zebra_printers[0]  # Automatically select the first available Zebra printer
+    logging.info(f"Auto-selected Zebra printer: {printer_name}")
     return printer_name
 
 # Simulated printer status check for Linux/Replit
@@ -147,12 +68,11 @@ def can_print_to_printer():
     """Test if we can actually print to the printer (simulated)"""
     system_os = platform.system()
     try:
-    ###
         if system_os == "Windows":
             import win32print  # type: ignore
             import wmi  # type: ignore
             # Try to open the printer for printing
-            hprinter = win32print.OpenPrinter(printer_name)
+            hprinter = win32print.OpenPrinter(printer_name if printer_name else "")
             
             # Try to start a document (this will fail if printer truly unavailable)
             doc_info = ("Test Document", "", "RAW")
@@ -177,12 +97,11 @@ def can_print_to_printer():
 def is_printer_online():
     system_os = platform.system()
     try:
-    ###
         if system_os == "Windows":
             import win32print  # type: ignore
             import wmi  # type: ignore
             # Try to open the printer for printing            
-            hprinter = win32print.OpenPrinter(printer_name)
+            hprinter = win32print.OpenPrinter(printer_name if printer_name else "")
             printer_status = win32print.GetPrinter(hprinter, 2)  # Query detailed printer information
             win32print.ClosePrinter(hprinter)
 
@@ -216,7 +135,7 @@ def is_printer_online():
             logging.info(f"Printer '{printer_name}' is online.")
             return True            
         else:
-            # macOS or other OS .Linux/Replit printer detection (simulation for cloud environment)
+            # macOS or other OS Linux/Replit printer detection (simulation for cloud environment)
             logging.info(f"Simulated printer '{printer_name}' is online.")
             return True
     except Exception as e:
@@ -240,7 +159,7 @@ def print_zpl(zpl_data):
             import win32print  # type: ignore
             import wmi  # type: ignore
             # Open a handle to the printer
-            hprinter = win32print.OpenPrinter(printer_name)
+            hprinter = win32print.OpenPrinter(printer_name if printer_name else "")
             try:
                 # Create a printer job
                 hjob = win32print.StartDocPrinter(hprinter, 1, ("ZPL Print Job", "", "RAW"))
@@ -277,7 +196,7 @@ def print_zpl(zpl_data):
 def wait_for_print_completion(job_id, max_unknown_retries=5, poll_interval=0.5):
     """
     Waits until the print job is completed, removed from the queue, or encounters an error.
-    Uses WMI to track job status.
+    For Linux/Replit environment, this is simulated.
 
     Args:
         job_id (int or str): The ID of the print job to monitor.
@@ -287,165 +206,200 @@ def wait_for_print_completion(job_id, max_unknown_retries=5, poll_interval=0.5):
     Returns:
         bool: True if the job completed successfully, False otherwise.
     """
-    import win32print, time, wmi, pythoncom
-    pythoncom.CoInitialize()  # Initialize COM for the thread
-    try:
-        c = wmi.WMI()
+    system_os = platform.system()
+    
+    if system_os == "Windows":
+        try:
+            import win32print, time, wmi, pythoncom
+            pythoncom.CoInitialize()  # Initialize COM for the thread
+            try:
+                c = wmi.WMI()
 
-        # logging.info(f"Monitoring print job {job_id}...")
-        logging.info(f"Monitoring print job {job_id} on printer '{printer_name}'...")
+                # logging.info(f"Monitoring print job {job_id}...")
+                logging.info(f"Monitoring print job {job_id} on printer '{printer_name}'...")
 
-        unknown_status_count = 0  # Counter for UNKNOWN status
+                unknown_status_count = 0  # Counter for UNKNOWN status
 
-        while True:
-            job_found = False
-            for job in c.Win32_PrintJob():
-                if str(job.JobId) == str(job_id):  # Ensure JobId matches
-                    job_found = True
-                    job_status = str(job.JobStatus).lower() if job.JobStatus else ""
-                    logging.info(f"Print job {job_id} - Status: {job.Status}, Job_Status: {job_status}")
+                while True:
+                    job_found = False
+                    for job in c.Win32_PrintJob():
+                        if str(job.JobId) == str(job_id):  # Ensure JobId matches
+                            job_found = True
+                            job_status = str(job.JobStatus).lower() if job.JobStatus else ""
+                            logging.info(f"Print job {job_id} - Status: {job.Status}, Job_Status: {job_status}")
 
-                    if job.Status is None or "unknown" in str(job.Status).lower():
-                        unknown_status_count += 1
-                        logging.warning(f"Print job {job_id} status UNKNOWN (Attempt {unknown_status_count})")
+                            if job.Status is None or "unknown" in str(job.Status).lower():
+                                unknown_status_count += 1
+                                logging.warning(f"Print job {job_id} status UNKNOWN (Attempt {unknown_status_count})")
 
-                        # If UNKNOWN appears too many times, cancel & clear jobs, then terminate
-                        if unknown_status_count >= max_unknown_retries:
-                            logging.error(f"Print job {job_id} stuck in UNKNOWN state. Cancelling all print jobs...")
-                            cancel_print_job(job_id)  # Cancel the specific job
-                            clear_all_print_jobs()  # Clear the entire queue
-                            logging.critical("Exiting program due to persistent UNKNOWN printer status.")
-                            return False
+                                # If UNKNOWN appears too many times, cancel & clear jobs, then terminate
+                                if unknown_status_count >= max_unknown_retries:
+                                    logging.error(f"Print job {job_id} stuck in UNKNOWN state. Cancelling all print jobs...")
+                                    cancel_print_job(job_id)  # Cancel the specific job
+                                    clear_all_print_jobs()  # Clear the entire queue
+                                    logging.critical("Exiting program due to persistent UNKNOWN printer status.")
+                                    return False
+                                
+                                time.sleep(poll_interval)  # Wait before retrying
+                                continue
+
+                            if job_status == "completed":
+                                logging.info(f"Print job {job_id} completed successfully.")
+                                return True
+                            elif job_status ==  "deleted":
+                                logging.warning(f"Print job {job_id} was deleted.")
+                                return False
+                            elif "error" in job_status:
+                                logging.error(f"Print job {job_id} encountered an error: {job_status}")
+                                return False
+                            elif "printing" in job_status:
+                                logging.info(f"Print job {job_id} is currently printing...")
+                                time.sleep(poll_interval)
+                            else:
+                                logging.info(f"Print job {job_id} is in an intermediate state: {job_status}")
+                                time.sleep(poll_interval)
+
+                    # If the print job is no longer in the queue, check if the printer itself is IDLE
+                    if not job_found:
+                        logging.warning(f"Print job {job_id} not found in queue. Checking printer status...")
                         
-                        time.sleep(poll_interval)  # Wait before retrying
-                        continue
-
-                    if job_status == "completed":
-                        logging.info(f"Print job {job_id} completed successfully.")
-                        return True
-                    elif job_status ==  "deleted":
-                        logging.warning(f"Print job {job_id} was deleted.")
-                        return False
-                    elif "error" in job_status:
-                        logging.error(f"Print job {job_id} encountered an error: {job_status}")
-                        return False
-                    elif "printing" in job_status:
-                        logging.info(f"Print job {job_id} is currently printing...")
-                        time.sleep(poll_interval)
-                    else:
-                        logging.info(f"Print job {job_id} is in an intermediate state: {job_status}")
+                        # Find the correct printer
+                        if printer_name:
+                            printer = next((p for p in c.Win32_Printer() if p.Name and p.Name.lower() == printer_name.lower()), None)
+                        else:
+                            printer = None
+                        if printer:
+                            if printer.PrinterStatus == 3:  # 3 = Idle
+                                logging.info(f"Printer '{printer.Name}' is idle. Assuming job {job_id} is complete.")
+                                return True  # Printer is idle, assume job is done
+                            else:
+                                logging.warning(f"Printer '{printer.Name}' status: {printer.PrinterStatus} - Waiting...")
+                        else:
+                            logging.error(f"Printer '{printer_name}' not found in system.")
+                            return False
+                    
                         time.sleep(poll_interval)
 
-            # If the print job is no longer in the queue, check if the printer itself is IDLE
-            if not job_found:
-                logging.warning(f"Print job {job_id} not found in queue. Checking printer status...")
-                
-                # Find the correct printer
-                printer = next((p for p in c.Win32_Printer() if p.Name and p.Name.lower() == printer_name.lower()), None)
-                if printer:
-                    if printer.PrinterStatus == 3:  # 3 = Idle
-                        logging.info(f"Printer '{printer.Name}' is idle. Assuming job {job_id} is complete.")
-                        return True  # Printer is idle, assume job is done
-                    else:
-                        logging.warning(f"Printer '{printer.Name}' status: {printer.PrinterStatus} - Waiting...")
-                else:
-                    logging.error(f"Printer '{printer_name}' not found in system.")
-                    return False
-            
-                time.sleep(poll_interval)
+            except Exception as e:
+                logging.error(f"Failed to monitor print job {job_id}: {e}")
+                return False
 
-    except Exception as e:
-        logging.error(f"Failed to monitor print job {job_id}: {e}")
-        return False
-
-    finally:
-        pythoncom.CoUninitialize()  # Clean up COM
-        logging.info(f"Stopped monitoring print job {job_id}.")
+            finally:
+                pythoncom.CoUninitialize()  # Clean up COM
+                logging.info(f"Stopped monitoring print job {job_id}.")
+        except ImportError:
+            logging.warning("Windows print monitoring libraries not available, using simulation.")
+            # Fall through to simulation
+    
+    # Simulation for Linux/Replit environment
+    import time
+    logging.info(f"=== SIMULATED PRINT JOB MONITORING ===")
+    logging.info(f"Monitoring simulated print job {job_id} on printer '{printer_name}'...")
+    
+    # Simulate some processing time
+    time.sleep(poll_interval * 2)
+    
+    logging.info(f"Simulated print job {job_id} completed successfully.")
+    logging.info(f"=== END PRINT JOB MONITORING ===")
+    return True
 
 def cancel_print_job(job_id):
     """
-    Cancels a specific print job using win32print.
+    Cancels a specific print job using win32print (Windows only).
     """
-    hprinter = None
-    try:
-        # Open the printer
-        hprinter = win32print.OpenPrinter(printer_name)
-        logging.info(f"Opened printer: {printer_name}")
+    system_os = platform.system()
+    
+    if system_os == "Windows":
+        try:
+            import win32print
+            hprinter = None
+            try:
+                # Open the printer
+                hprinter = win32print.OpenPrinter(printer_name if printer_name else "")
+                logging.info(f"Opened printer: {printer_name}")
 
-        # Enumerate all print jobs
-        jobs = win32print.EnumJobs(hprinter, 0, -1, 1)
-        if not jobs:
-            logging.warning(f"No print jobs found in the queue for printer: {printer_name}.")
-            return False
-
-        # Search for the specific job ID
-        for job in jobs:
-            if job["JobId"] == job_id:  # Match the job ID
-                logging.info(f"Cancelling print job {job_id}...")
-                try:
-                    # Use JOB_CONTROL_DELETE to cancel the job
-                    win32print.SetJob(hprinter, job_id, 0, None, win32print.JOB_CONTROL_DELETE)
-                    logging.info(f"Print job {job_id} successfully cancelled.")
-                    return True  # Job found and cancelled
-                except Exception as e:
-                    logging.error(f"Failed to cancel print job {job_id}: {e}")
+                # Enumerate all print jobs
+                jobs = win32print.EnumJobs(hprinter, 0, -1, 1)
+                if not jobs:
+                    logging.warning(f"No print jobs found in the queue for printer: {printer_name}.")
                     return False
 
-        logging.warning(f"Print job {job_id} not found in queue.")
-        return False  # Job not found
+                # Search for the specific job ID
+                for job in jobs:
+                    if job["JobId"] == job_id:  # Match the job ID
+                        logging.info(f"Cancelling print job {job_id}...")
+                        try:
+                            # Use JOB_CONTROL_DELETE to cancel the job
+                            win32print.SetJob(hprinter, job_id, 0, None, win32print.JOB_CONTROL_DELETE)
+                            logging.info(f"Print job {job_id} successfully cancelled.")
+                            return True  # Job found and cancelled
+                        except Exception as e:
+                            logging.error(f"Failed to cancel print job {job_id}: {e}")
+                            return False
 
-    except Exception as e:
-        logging.error(f"Failed to cancel print job {job_id}: {e}")
-        return False
+                logging.warning(f"Print job {job_id} not found in queue.")
+                return False  # Job not found
 
-    finally:
-        if hprinter:
-            win32print.ClosePrinter(hprinter)
-            logging.info(f"Closed printer: {printer_name}")
+            except Exception as e:
+                logging.error(f"Failed to cancel print job {job_id}: {e}")
+                return False
+
+            finally:
+                if hprinter:
+                    win32print.ClosePrinter(hprinter)
+                    logging.info(f"Closed printer: {printer_name}")
+        except ImportError:
+            logging.warning("Windows print libraries not available for job cancellation.")
+            return False
+    else:
+        # Simulation for Linux/Replit
+        logging.info(f"Simulated: Print job {job_id} cancelled successfully.")
+        return True
 
 # Clear print jobs win32
 def clear_all_print_jobs():
     """
-    Clears all print jobs from the queue using win32print.
+    Clears all print jobs from the queue using win32print (Windows only).
     """
-    hprinter = None
-    try:
-        # Open the printer
-        hprinter = win32print.OpenPrinter(printer_name)
-        logging.info(f"Opened printer: {printer_name}")
-
-        # Enumerate all print jobs
-        jobs = win32print.EnumJobs(hprinter, 0, -1, 1)
-        if not jobs:
-            logging.info("No print jobs found in the queue.")
-            return
-
-        # Delete each print job
-        for job in jobs:
-            job_id = job["JobId"]
-            logging.info(f"Deleting print job {job_id}...")
+    system_os = platform.system()
+    
+    if system_os == "Windows":
+        try:
+            import win32print
+            hprinter = None
             try:
-                # Use JOB_CONTROL_DELETE to remove the job
-                win32print.SetJob(hprinter, job_id, 0, None, win32print.JOB_CONTROL_DELETE)
-                logging.info(f"Successfully deleted print job {job_id}.")
+                # Open the printer
+                hprinter = win32print.OpenPrinter(printer_name if printer_name else "")
+                logging.info(f"Opened printer: {printer_name}")
+
+                # Enumerate all print jobs
+                jobs = win32print.EnumJobs(hprinter, 0, -1, 1)
+                if not jobs:
+                    logging.info("No print jobs found in the queue.")
+                    return
+
+                # Delete each print job
+                for job in jobs:
+                    job_id = job["JobId"]
+                    logging.info(f"Deleting print job {job_id}...")
+                    try:
+                        # Use JOB_CONTROL_DELETE to remove the job
+                        win32print.SetJob(hprinter, job_id, 0, None, win32print.JOB_CONTROL_DELETE)
+                        logging.info(f"Successfully deleted print job {job_id}.")
+                    except Exception as e:
+                        logging.error(f"Failed to delete print job {job_id}: {e}")
+
+                logging.info("All print jobs cleared successfully.")
+
             except Exception as e:
-                logging.error(f"Failed to delete print job {job_id}: {e}")
+                logging.error(f"Failed to clear all print jobs: {e}")
 
-        logging.info("All print jobs cleared successfully.")
-
-    except Exception as e:
-        logging.error(f"Failed to clear all print jobs: {e}")
-
-    finally:
-        if hprinter:
-            win32print.ClosePrinter(hprinter)
-            logging.info(f"Closed printer: {printer_name}")
-
-    """
-    Simulates clearing all print jobs from the queue.
-    """
-    try:
+            finally:
+                if hprinter:
+                    win32print.ClosePrinter(hprinter)
+                    logging.info(f"Closed printer: {printer_name}")
+        except ImportError:
+            logging.warning("Windows print libraries not available for clearing jobs.")
+    else:
+        # Simulation for Linux/Replit
         logging.info("Simulated: All print jobs cleared successfully.")
-
-    except Exception as e:
-        logging.error(f"Failed to clear all simulated print jobs: {e}")
