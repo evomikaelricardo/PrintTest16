@@ -44,14 +44,14 @@ def show_login():
     
     # Username field
     username_label = tk.Label(card_content, text="Username:", **config.LABEL_STYLE)
-    username_label.grid(row=2, column=0, sticky='e', padx=(0, 15), pady=10)
+    username_label.grid(row=2, column=0, sticky='w', padx=(0, 15), pady=10)
     
     username_entry = config.create_fluent_entry(card_content, width=25)
     username_entry.grid(row=2, column=1, sticky='ew', pady=10)
     
     # Password field
     password_label = tk.Label(card_content, text="Password:", **config.LABEL_STYLE)
-    password_label.grid(row=3, column=0, sticky='e', padx=(0, 15), pady=10)
+    password_label.grid(row=3, column=0, sticky='w', padx=(0, 15), pady=10)
     
     password_entry = config.create_fluent_entry(card_content, width=25, show="*")
     password_entry.grid(row=3, column=1, sticky='ew', pady=10)
