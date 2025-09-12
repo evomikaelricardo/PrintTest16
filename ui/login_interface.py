@@ -12,24 +12,24 @@ def show_login():
     """
     login_window = tk.Tk()
     window_width = 500
-    window_height = 400
+    window_height = 500
     config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Login")
     
     # Configure background
     login_window.configure(bg=config.BACKGROUND_COLOR)
     
-    # Main container
+    # Main container with adjusted padding
     main_container = tk.Frame(login_window, bg=config.BACKGROUND_COLOR)
-    main_container.pack(fill='both', expand=True, padx=50, pady=50)
+    main_container.pack(fill='both', expand=True, padx=30, pady=30)
     
     # Login Card
     login_card = tk.Frame(main_container, bg=config.CARD_COLOR, relief='flat', bd=1)
     login_card.configure(highlightbackground=config.BORDER_COLOR, highlightthickness=1)
     login_card.pack(fill='both', expand=True)
     
-    # Card content with padding
+    # Card content with reduced padding
     card_content = tk.Frame(login_card, bg=config.CARD_COLOR)
-    card_content.pack(fill='both', expand=True, padx=40, pady=40)
+    card_content.pack(fill='both', expand=True, padx=30, pady=25)
     
     # Header
     header_label = tk.Label(card_content, text="Login to RFID Printer", **config.HEADER_STYLE)
