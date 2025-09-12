@@ -136,11 +136,11 @@ def start_main_application():
 
 def add_logout_menu(window):
     """
-    Add a menu icon with logout functionality to the top left corner of a window.
+    Add a menu icon with logout functionality to the bottom left corner of a window.
     """
-    # Create menu frame in top left
+    # Create menu frame in bottom left
     menu_frame = tk.Frame(window, bg=config.CARD_COLOR if hasattr(config, 'CARD_COLOR') else 'white')
-    menu_frame.place(x=10, y=10)  # Position in top left corner
+    menu_frame.place(x=10, rely=1.0, y=-10, anchor='sw')  # Position in bottom left corner
     
     # Menu icon button (using a simple text-based icon)
     menu_button = tk.Button(
@@ -168,9 +168,9 @@ def show_logout_menu(parent_window, menu_button):
     menu = tk.Menu(parent_window, tearoff=0)
     menu.add_command(label="Logout", command=lambda: handle_logout(parent_window))
     
-    # Show menu below the button
+    # Show menu above the button (since button is now at bottom)
     x = menu_button.winfo_rootx()
-    y = menu_button.winfo_rooty() + menu_button.winfo_height()
+    y = menu_button.winfo_rooty() - 30  # Show above the button
     menu.tk_popup(x, y)
 
 def handle_logout(current_window):
