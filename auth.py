@@ -58,8 +58,20 @@ def login(username, password):
     if response and response.get("status_code") == 200:
         # Login successful
         current_user = username
-        auth_token = response.get("data", {}).get("access_token")  # Store token if provided
-        logging.info(f"Login successful for user: {username}")
+        
+        # Handle both dict and list formats for data field
+        data = response.get("data", {})
+        if isinstance(data, list) and len(data) > 0:
+            # If data is a list, get the first item
+            auth_token = data[0].get("access_token") if data[0] and isinstance(data[0], dict) else None
+        elif isinstance(data, dict):
+            # If data is a dict, get access_token directly
+            auth_token = data.get("access_token")
+        else:
+            auth_token = None
+            
+        logging.info(f"Login successful for user: {username}, token extracted: {'Yes' if auth_token else 'No'}")
+        logging.debug(f"Response data structure: {type(data)} - {data}")
         return True
     else:
         # Login failed
