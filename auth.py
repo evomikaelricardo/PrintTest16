@@ -58,7 +58,7 @@ def login(username, password):
     if response and response.get("status_code") == 200:
         # Login successful
         current_user = username
-        auth_token = response.get("data", {}).get("token")  # Store token if provided
+        auth_token = response.get("data", {}).get("access_token")  # Store token if provided
         logging.info(f"Login successful for user: {username}")
         return True
     else:
