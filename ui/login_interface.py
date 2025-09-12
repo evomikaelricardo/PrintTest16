@@ -39,7 +39,7 @@ def show_login():
     card_content.grid_columnconfigure(2, weight=1)
     
     # Header
-    header_label = tk.Label(card_content, text="Login to continue", **config.HEADER_STYLE)
+    header_label = tk.Label(card_content, text="Please login to continue", **config.HEADER_STYLE)
     header_label.grid(row=1, column=0, columnspan=3, pady=(0, 40), sticky='ew')
     
     # Username field
@@ -95,7 +95,7 @@ def show_login():
         command=handle_login,
         **config.BUTTON_STYLE
     )
-    login_button.grid(row=4, column=1, pady=(30, 10), sticky='')  # Aligned with textboxes
+    login_button.grid(row=4, column=1, pady=(30, 10), sticky='w')  # Left justified with textboxes
     
     # Bind Enter key to login
     login_window.bind('<Return>', handle_enter)
