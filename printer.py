@@ -56,15 +56,25 @@ def detect_printers():
     if not zebra_printers:
         messagebox.showwarning("No Printers", "No Zebra printers found. Using virtual printer for demo.")
         printer_name = "Virtual Zebra Printer"
+        return [printer_name]
+
+    return zebra_printers
+
+# Function to show printer selection dialog and return selected printer
+def select_printer(available_printers):
+    global printer_name
+    
+    if not available_printers:
+        printer_name = "Virtual Zebra Printer"
         return printer_name
 
-    if len(zebra_printers) == 1:
-        printer_name = zebra_printers[0]  # Automatically select the only available Zebra printer
+    if len(available_printers) == 1:
+        printer_name = available_printers[0]  # Automatically select the only available Zebra printer
         logging.info(f"Auto-selected Zebra printer: {printer_name}")
         return printer_name
 
     # If multiple Zebra printers are found, prompt the user to select one
-    def select_printer(selected):
+    def on_select_printer(selected):
         global printer_name
         printer_name = selected.get()
         logging.info(f"User selected Zebra printer: {printer_name}")
@@ -114,11 +124,11 @@ def detect_printers():
     style = ttk.Style()
     style.configure('Modern.TCombobox', fieldbackground=config.CARD_COLOR, borderwidth=1)
     
-    selected_printer = tk.StringVar(value=zebra_printers[0])
+    selected_printer = tk.StringVar(value=available_printers[0])
     dropdown = ttk.Combobox(
         printer_selector_frame,
         textvariable=selected_printer,
-        values=zebra_printers,
+        values=available_printers,
         state="readonly",
         width=30,
         style='Modern.TCombobox',
@@ -134,7 +144,7 @@ def detect_printers():
     select_button = tk.Button(
         button_frame,
         text="Continue",
-        command=lambda: select_printer(selected_printer),
+        command=lambda: on_select_printer(selected_printer),
         **config.BUTTON_STYLE
     )
     select_button.pack(side=tk.RIGHT)
@@ -277,7 +287,7 @@ def print_zpl(zpl_data):
 def wait_for_print_completion(job_id, max_unknown_retries=5, poll_interval=0.5):
     """
     Waits until the print job is completed, removed from the queue, or encounters an error.
-    Uses WMI to track job status.
+    Uses WMI to track job status on Windows, simulates on other platforms.
 
     Args:
         job_id (int or str): The ID of the print job to monitor.
@@ -287,7 +297,21 @@ def wait_for_print_completion(job_id, max_unknown_retries=5, poll_interval=0.5):
     Returns:
         bool: True if the job completed successfully, False otherwise.
     """
-    import win32print, time, wmi, pythoncom
+    system_os = platform.system()
+    
+    if system_os != "Windows":
+        # Simulate completion on non-Windows systems
+        logging.info(f"Simulating completion of print job {job_id}")
+        time.sleep(1)  # Brief simulation delay
+        logging.info(f"Simulated print job {job_id} completed successfully.")
+        return True
+    
+    try:
+        import win32print, time, wmi, pythoncom  # type: ignore
+    except ImportError:
+        logging.warning("Windows print libraries not available, simulating completion")
+        time.sleep(1)
+        return True
     pythoncom.CoInitialize()  # Initialize COM for the thread
     try:
         c = wmi.WMI()
@@ -364,8 +388,24 @@ def wait_for_print_completion(job_id, max_unknown_retries=5, poll_interval=0.5):
 
 def cancel_print_job(job_id):
     """
-    Cancels a specific print job using win32print.
+    Cancels a specific print job using win32print on Windows, simulates on other platforms.
     """
+    system_os = platform.system()
+    
+    if system_os != "Windows":
+        logging.info(f"Simulating cancellation of print job {job_id}")
+        return True
+    
+    try:
+        import win32print  # type: ignore
+    except ImportError:
+        logging.warning("Windows print libraries not available, simulating cancellation")
+        return True
+    
+    if not printer_name:
+        logging.error("No printer name set")
+        return False
+        
     hprinter = None
     try:
         # Open the printer
@@ -406,8 +446,25 @@ def cancel_print_job(job_id):
 # Clear print jobs win32
 def clear_all_print_jobs():
     """
-    Clears all print jobs from the queue using win32print.
+    Clears all print jobs from the queue using win32print on Windows, simulates on other platforms.
     """
+    system_os = platform.system()
+    
+    if system_os != "Windows":
+        logging.info("Simulated: All print jobs cleared successfully.")
+        return True
+    
+    try:
+        import win32print  # type: ignore
+    except ImportError:
+        logging.warning("Windows print libraries not available, simulating clear")
+        logging.info("Simulated: All print jobs cleared successfully.")
+        return True
+    
+    if not printer_name:
+        logging.error("No printer name set")
+        return False
+        
     hprinter = None
     try:
         # Open the printer
@@ -418,7 +475,7 @@ def clear_all_print_jobs():
         jobs = win32print.EnumJobs(hprinter, 0, -1, 1)
         if not jobs:
             logging.info("No print jobs found in the queue.")
-            return
+            return True
 
         # Delete each print job
         for job in jobs:
@@ -432,20 +489,13 @@ def clear_all_print_jobs():
                 logging.error(f"Failed to delete print job {job_id}: {e}")
 
         logging.info("All print jobs cleared successfully.")
+        return True
 
     except Exception as e:
         logging.error(f"Failed to clear all print jobs: {e}")
+        return False
 
     finally:
         if hprinter:
             win32print.ClosePrinter(hprinter)
             logging.info(f"Closed printer: {printer_name}")
-
-    """
-    Simulates clearing all print jobs from the queue.
-    """
-    try:
-        logging.info("Simulated: All print jobs cleared successfully.")
-
-    except Exception as e:
-        logging.error(f"Failed to clear all simulated print jobs: {e}")
