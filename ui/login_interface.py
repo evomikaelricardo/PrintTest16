@@ -22,7 +22,7 @@ def show_login():
     # Connect menu button functionality if menu was created
     if result and isinstance(result, tuple) and len(result) == 2:
         title_bar, menu_button = result
-        menu_button.config(command=lambda: show_logout_menu(login_window, menu_button))
+        menu_button.config(command=lambda: show_login_menu(login_window, menu_button))
     
     # Main container with adjusted padding
     main_container = tk.Frame(login_window, bg=config.BACKGROUND_COLOR)
@@ -166,6 +166,19 @@ def start_main_application():
         show_login()
 
 # Old add_logout_menu function removed - now integrated into title bar
+
+def show_login_menu(parent_window, menu_button):
+    """
+    Show login menu when menu icon is clicked (no logout option since user hasn't logged in).
+    """
+    # Create popup menu
+    menu = tk.Menu(parent_window, tearoff=0)
+    menu.add_command(label="Exit", command=lambda: handle_exit(parent_window))
+    
+    # Show menu below the button (since button is now at top)
+    x = menu_button.winfo_rootx()
+    y = menu_button.winfo_rooty() + 30  # Show below the button
+    menu.tk_popup(x, y)
 
 def show_logout_menu(parent_window, menu_button):
     """
