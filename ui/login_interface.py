@@ -41,7 +41,7 @@ def show_login():
     
     # Logo
     try:
-        logo_image = Image.open("evo-48.png")
+        logo_image = Image.open("attached_assets/Evo200pixel_1757673015542.png")
         logo_photo = ImageTk.PhotoImage(logo_image)
         logo_label = tk.Label(card_content, image=logo_photo, bg=config.CARD_COLOR)
         logo_label.image = logo_photo  # Keep a reference to prevent garbage collection
