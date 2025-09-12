@@ -4,7 +4,7 @@ import config
 import auth
 from ui.main_interface import main
 from database import fetch_po_number
-from printer import detect_printers
+from printer import detect_printers, select_printer
 
 def show_login():
     """
@@ -106,8 +106,17 @@ def start_main_application():
     Start the main RFID application after successful login.
     """
     try:
-        # Detect printers
-        printer_name = detect_printers()
+        # Detect available printers
+        available_printers = detect_printers()
+        
+        # Handle printer selection (auto-select if one, show UI if multiple)
+        selected_printer = select_printer(available_printers)
+        
+        # Check if user cancelled printer selection
+        if not selected_printer:
+            messagebox.showinfo("Printer Required", "A printer must be selected to use the application.")
+            show_login()
+            return
         
         # Fetch PO numbers
         po_numbers = fetch_po_number()
@@ -126,9 +135,8 @@ def start_main_application():
             show_login()
             return
         
-        if printer_name:
-            # Start main interface with logout functionality
-            main(po_numbers)
+        # Start main interface with logout functionality
+        main(po_numbers)
     except Exception as e:
         messagebox.showerror("Application Error", f"Failed to start application: {e}")
         # Return to login on error

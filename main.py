@@ -1,13 +1,21 @@
 from ui.main_interface import main
-from printer import detect_printers
+from printer import detect_printers, select_printer
 from config import printer_name
 from database import fetch_po_number, get_err_msg
 from tkinter import messagebox, Tk
 import sys
 
 if __name__ == "__main__":
-    # Detect printers only once during startup
-    printer_name = detect_printers()
+    # Detect available printers
+    available_printers = detect_printers()
+    
+    # Handle printer selection (auto-select if one, show UI if multiple)
+    selected_printer = select_printer(available_printers)
+    
+    # Check if user cancelled printer selection
+    if not selected_printer:
+        messagebox.showinfo("Printer Required", "A printer must be selected to use the application.")
+        sys.exit()
 
     po_numbers = fetch_po_number()
     
@@ -22,5 +30,4 @@ if __name__ == "__main__":
         root.destroy()
         sys.exit()
 
-    if printer_name:
-        main(po_numbers)
+    main(po_numbers)

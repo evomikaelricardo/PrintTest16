@@ -8,10 +8,8 @@ import platform
 # Global variable to store printer name
 printer_name = None
 
-# Function to auto-detect Zebra printers (Cross-platform)
+# Function to detect Zebra printers (Cross-platform)
 def detect_printers():
-    global printer_name
-    
     system_os = platform.system()
     logging.info(f"Running on {system_os} - detecting printers")
     
@@ -55,12 +53,120 @@ def detect_printers():
 
     if not zebra_printers:
         messagebox.showwarning("No Printers", "No Zebra printers found. Using virtual printer for demo.")
-        printer_name = "Virtual Zebra Printer"
-        return printer_name
+        zebra_printers = ["Virtual Zebra Printer"]
+    
+    return zebra_printers
 
-    # For Replit/cloud environment, auto-select the first printer to avoid GUI blocking
-    printer_name = zebra_printers[0]  # Automatically select the first available Zebra printer
-    logging.info(f"Auto-selected Zebra printer: {printer_name}")
+def select_printer(available_printers):
+    """
+    Select a printer from available options. 
+    If only one printer, auto-select it.
+    If multiple printers, show selection interface.
+    """
+    global printer_name
+    
+    if len(available_printers) == 1:
+        # Auto-select if only one printer
+        printer_name = available_printers[0]
+        logging.info(f"Auto-selected single printer: {printer_name}")
+        return printer_name
+    
+    # Multiple printers - show selection interface
+    return show_printer_selection(available_printers)
+
+def show_printer_selection(printers):
+    """
+    Show a printer selection dialog when multiple printers are available.
+    """
+    global printer_name
+    
+    selection_window = tk.Tk()
+    selection_window.title("Select Printer")
+    config.center_window(selection_window, 500, 300, "Select Printer - EVO RFID Printer")
+    selection_window.configure(bg=config.BACKGROUND_COLOR)
+    
+    selected_printer = tk.StringVar()
+    
+    # Main container
+    main_container = tk.Frame(selection_window, bg=config.BACKGROUND_COLOR)
+    main_container.pack(fill='both', expand=True, padx=30, pady=30)
+    
+    # Selection Card
+    selection_card = tk.Frame(main_container, bg=config.CARD_COLOR, relief='flat', bd=1)
+    selection_card.configure(highlightbackground=config.BORDER_COLOR, highlightthickness=1)
+    selection_card.pack(fill='both', expand=True)
+    
+    # Card content
+    card_content = tk.Frame(selection_card, bg=config.CARD_COLOR)
+    card_content.pack(fill='both', expand=True, padx=30, pady=25)
+    
+    # Header
+    header_label = tk.Label(card_content, text="Multiple Printers Detected", **config.HEADER_STYLE)
+    header_label.pack(pady=(0, 15))
+    
+    # Instruction
+    instruction_label = tk.Label(
+        card_content, 
+        text="Please select a printer to use for RFID tag printing:",
+        **config.LABEL_STYLE
+    )
+    instruction_label.pack(pady=(0, 20))
+    
+    # Printer selection dropdown
+    style = ttk.Style()
+    config.configure_fluent_combobox_style(style)
+    
+    printer_dropdown = ttk.Combobox(
+        card_content,
+        textvariable=selected_printer,
+        values=printers,
+        state="readonly",
+        width=50,
+        style='Fluent.TCombobox'
+    )
+    printer_dropdown.pack(pady=(0, 30))
+    
+    # Set first printer as default selection
+    selected_printer.set(printers[0])
+    
+    # Button frame
+    button_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
+    button_frame.pack(fill='x')
+    
+    def on_select():
+        if selected_printer.get():
+            printer_name = selected_printer.get()
+            logging.info(f"User selected printer: {printer_name}")
+            selection_window.destroy()
+        else:
+            messagebox.showwarning("Selection Required", "Please select a printer.")
+    
+    def on_cancel():
+        global printer_name
+        printer_name = None
+        selection_window.destroy()
+    
+    # Select button
+    select_button = tk.Button(
+        button_frame,
+        text="Select Printer",
+        command=on_select,
+        **config.BUTTON_STYLE
+    )
+    select_button.pack(side=tk.RIGHT, padx=(10, 0))
+    
+    # Cancel button  
+    cancel_button = tk.Button(
+        button_frame,
+        text="Cancel",
+        command=on_cancel,
+        **config.SECONDARY_BUTTON_STYLE
+    )
+    cancel_button.pack(side=tk.RIGHT)
+    
+    # Start the selection window
+    selection_window.mainloop()
+    
     return printer_name
 
 # Simulated printer status check for Linux/Replit
