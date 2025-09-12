@@ -1,5 +1,5 @@
 import requests, logging
-from config import BASE_URL, API_TOKEN
+import config
 
 # Configure logging
 logging.basicConfig(
@@ -20,9 +20,9 @@ def api_request(method, endpoint, headers=None, payload=None, params=None):
     A reusable function to handle API requests.
     """
     global error_msg    
-    url = f"{BASE_URL}{endpoint}"
+    url = f"{config.BASE_URL}{endpoint}"
     headers = headers or {
-        "Authorization": f"Bearer {API_TOKEN}",
+        "Authorization": f"Bearer {config.API_TOKEN}",
         "Content-Type": "application/json"
     }
     TIMEOUT = 10  # seconds
