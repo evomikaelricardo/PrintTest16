@@ -10,6 +10,10 @@ printer_name = None
 BASE_URL = "https://mvdev.evosmartlife.net"
 API_TOKEN = "notavailableyet"
 
+# Authentication endpoints
+LOGIN_ENDPOINT = "/api/ewms/login"
+LOGOUT_ENDPOINT = "/api/ewms/logout"
+
 # Windows Fluent UI color palette
 PRIMARY_COLOR = "#005A9F"  # Fluent Blue
 PRIMARY_HOVER = "#106EBE"  # Fluent Blue Hover

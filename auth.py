@@ -49,7 +49,7 @@ def login(username, password):
     """
     global current_user, auth_token
 
-    endpoint = "https://mvdev.evosmartlife.net/api/ewms/login"
+    endpoint = f"{config.BASE_URL}{config.LOGIN_ENDPOINT}"
     payload = {"username": username, "password": password}
 
     logging.info(f"Attempting login for user: {username}")
@@ -102,7 +102,7 @@ def logout():
     """
     global current_user, auth_token
 
-    endpoint = "https://mvdev.evosmartlife.net/api/ewms/logout"
+    endpoint = f"{config.BASE_URL}{config.LOGOUT_ENDPOINT}"
     headers = {"Content-Type": "application/json"}
 
     # Add authorization header if we have a token
