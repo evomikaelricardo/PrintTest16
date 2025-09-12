@@ -35,7 +35,7 @@ def show_login():
     card_content.grid_rowconfigure(0, weight=1)  # Above content
     card_content.grid_rowconfigure(5, weight=1)  # Below content
     card_content.grid_columnconfigure(0, weight=1)
-    card_content.grid_columnconfigure(1, weight=0)
+    card_content.grid_columnconfigure(1, weight=2)  # Give more weight to textbox column
     card_content.grid_columnconfigure(2, weight=1)
     
     # Header
@@ -95,7 +95,7 @@ def show_login():
         command=handle_login,
         **config.BUTTON_STYLE
     )
-    login_button.grid(row=4, column=0, columnspan=3, pady=(30, 10), sticky='')  # Centered across all columns
+    login_button.grid(row=4, column=1, pady=(30, 10), sticky='')  # Aligned with textboxes
     
     # Bind Enter key to login
     login_window.bind('<Return>', handle_enter)
