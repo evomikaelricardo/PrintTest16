@@ -39,7 +39,7 @@ def show_login():
     card_content.grid_columnconfigure(2, weight=1)
     
     # Header
-    header_label = tk.Label(card_content, text="Login to RFID Printer", **config.HEADER_STYLE)
+    header_label = tk.Label(card_content, text="Login to continue", **config.HEADER_STYLE)
     header_label.grid(row=1, column=0, columnspan=3, pady=(0, 40), sticky='ew')
     
     # Username field
