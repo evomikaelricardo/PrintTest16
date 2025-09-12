@@ -336,6 +336,10 @@ def second_interface(root, po_number, warehouse_id, initial_items=None):
     window_height = 650
     center_window(next_window, window_width, window_height, "Generate RFID Tag (Step 2 of 2)")
     next_window.configure(bg=config.BACKGROUND_COLOR)
+    
+    # Add logout menu to top left corner
+    from ui.login_interface import add_logout_menu
+    add_logout_menu(next_window)
 
     # Main container
     main_container = tk.Frame(next_window, bg=config.BACKGROUND_COLOR)

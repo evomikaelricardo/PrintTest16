@@ -15,35 +15,14 @@ def main():
         os.environ['DISPLAY'] = ':0'
     
     try:
-        # Import and run the main application
-        from ui.main_interface import main as app_main
-        from printer import detect_printers
-        from config import printer_name
-        from database import fetch_po_number, get_err_msg
-        from tkinter import messagebox, Tk
+        # Import and run the login interface
+        from ui.login_interface import show_login
         
-        # Configure modern TTK styles
+        print("Starting RFID Printer Application...")
+        print("Showing login page...")
         
-        print("Detecting printers...")
-        printer_name = detect_printers()
-        
-        print("Fetching purchase orders...")
-        po_numbers = fetch_po_number()
-        
-        if not po_numbers:
-            print("Warning: No Purchase Orders available.")
-            error_msg = get_err_msg()
-            if error_msg:
-                print(f"Error: {error_msg}")
-            print("The application will show this information in a dialog.")
-        
-        if printer_name:
-            print(f"Selected printer: {printer_name}")
-            print("Starting GUI application...")
-            app_main(po_numbers)
-        else:
-            print("No printer detected, but continuing with simulation.")
-            app_main(po_numbers)
+        # Start with login page
+        show_login()
             
     except ImportError as e:
         print(f"Import error: {e}")

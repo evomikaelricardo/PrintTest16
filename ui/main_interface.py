@@ -14,6 +14,10 @@ def main(initial_po_numbers=None):
 
     # Configure root background
     root.configure(bg=config.BACKGROUND_COLOR)
+    
+    # Add logout menu to top left corner
+    from ui.login_interface import add_logout_menu
+    add_logout_menu(root)
 
     # Variables
     selected_po = tk.StringVar()
