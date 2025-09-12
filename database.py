@@ -19,13 +19,7 @@ def api_request(method, endpoint, headers=None, payload=None, params=None):
     """
     A reusable function to handle API requests.
     """
-    global error_msg
-    
-    # Check if API_TOKEN is None and redirect to login if needed
-    if API_TOKEN is None:
-        from ui.login_interface import show_login
-        show_login()
-        return None
+    global error_msg    
     url = f"{BASE_URL}{endpoint}"
     headers = headers or {
         "Authorization": f"Bearer {API_TOKEN}",

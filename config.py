@@ -8,7 +8,7 @@ printer_name = None
 
 # Base URL & API TOKEN for MVDEV - dev & staging
 BASE_URL = "https://mvdev.evosmartlife.net"
-API_TOKEN = None
+API_TOKEN = "notavailableyet"
 
 # Windows Fluent UI color palette
 PRIMARY_COLOR = "#005A9F"  # Fluent Blue
