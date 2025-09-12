@@ -14,15 +14,10 @@ def show_login():
     login_window = tk.Tk()
     window_width = 500
     window_height = 550
-    result = config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Secure Access", show_menu=True)
+    config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Secure Access")
     
     # Configure background
     login_window.configure(bg=config.BACKGROUND_COLOR)
-    
-    # Connect menu button functionality if menu was created
-    if result and isinstance(result, tuple) and len(result) == 2:
-        title_bar, menu_button = result
-        menu_button.config(command=lambda: show_logout_menu(login_window, menu_button))
     
     # Main container with adjusted padding
     main_container = tk.Frame(login_window, bg=config.BACKGROUND_COLOR)
