@@ -14,32 +14,10 @@ def show_login():
     login_window = tk.Tk()
     window_width = 500
     window_height = 550
-    result = config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Secure Access", show_menu=True)
+    config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Secure Access")
     
     # Configure background
     login_window.configure(bg=config.BACKGROUND_COLOR)
-    
-    # Connect menu button functionality if menu was created
-    if result and isinstance(result, tuple) and len(result) == 2:
-        title_bar, menu_button = result
-        # Custom menu for login page (no logout option)
-        def show_login_menu():
-            """Show login page menu with only exit option"""
-            menu = tk.Menu(login_window, tearoff=0, bg=config.CARD_COLOR, fg=config.PRIMARY_COLOR, 
-                          activebackground=config.PRIMARY_COLOR, activeforeground='white',
-                          relief='flat', borderwidth=1)
-            menu.add_command(label="Exit Application", command=lambda: login_window.quit())
-            
-            try:
-                # Position menu relative to button
-                x = menu_button.winfo_rootx()
-                y = menu_button.winfo_rooty() + menu_button.winfo_height()
-                menu.post(x - 120, y)  # Offset to align properly
-            except Exception as e:
-                print(f"Menu positioning error: {e}")
-                menu.post(0, 0)
-        
-        menu_button.config(command=show_login_menu)
     
     # Main container with adjusted padding
     main_container = tk.Frame(login_window, bg=config.BACKGROUND_COLOR)
