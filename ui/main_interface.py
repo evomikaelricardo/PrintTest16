@@ -10,7 +10,6 @@ import auth
 def main(initial_po_numbers=None):
     # Check if user is authenticated before allowing access
     if not auth.is_authenticated():
-        messagebox.showerror("Authentication Required", "You must login first to access this feature.")
         # Import and show login instead of continuing
         from ui.login_interface import show_login
         show_login()
