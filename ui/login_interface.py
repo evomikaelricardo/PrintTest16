@@ -13,7 +13,7 @@ def show_login():
     """
     login_window = tk.Tk()
     window_width = 500
-    window_height = 500
+    window_height = 550
     config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Secure Access")
     
     # Configure background
