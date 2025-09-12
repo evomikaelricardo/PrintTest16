@@ -15,15 +15,27 @@ def main():
         os.environ['DISPLAY'] = ':0'
     
     try:
-        # Import and run the main application
+        # Import required modules
+        from ui.login_screen import LoginScreen
         from ui.main_interface import main as app_main
         from printer import detect_printers
         from config import printer_name
         from database import fetch_po_number, get_err_msg
         from tkinter import messagebox, Tk
+        import config
         
-        # Configure modern TTK styles
+        # Show login screen first
+        print("Showing login screen...")
+        login_screen = LoginScreen()
+        login_successful = login_screen.show_login()
         
+        if not login_successful:
+            print("Login cancelled or failed. Exiting application.")
+            return
+        
+        print(f"Login successful! Welcome {config.current_user or 'User'}")
+        
+        # Continue with normal application flow after successful login
         print("Detecting printers...")
         printer_name = detect_printers()
         
