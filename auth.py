@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from database import logging
 import json
+import config
 
 # Global variable to store authentication state
 current_user = None
@@ -70,8 +71,17 @@ def login(username, password):
         else:
             auth_token = None
             
+        # Store access_token to API_TOKEN in config.py
+        if auth_token:
+            config.API_TOKEN = auth_token
+            
         logging.info(f"Login successful for user: {username}, token extracted: {'Yes' if auth_token else 'No'}")
         logging.debug(f"Response data structure: {type(data)} - {data}")
+        
+        # Log both access_token and API_TOKEN values
+        logging.info(f"access_token value: {auth_token}")
+        logging.info(f"API_TOKEN value: {config.API_TOKEN}")
+        
         return True
     else:
         # Login failed
