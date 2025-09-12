@@ -32,3 +32,7 @@ args = "python run_gui.py"
 [deployment]
 deploymentTarget = "vm"
 run = ["python", "run_gui.py"]
+
+[[ports]]
+localPort = 39097
+externalPort = 80

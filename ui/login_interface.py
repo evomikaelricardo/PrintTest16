@@ -31,29 +31,30 @@ def show_login():
     card_content = tk.Frame(login_card, bg=config.CARD_COLOR)
     card_content.pack(fill='both', expand=True, padx=30, pady=25)
     
+    # Configure grid weights for proper centering
+    card_content.grid_rowconfigure(0, weight=1)  # Above content
+    card_content.grid_rowconfigure(5, weight=1)  # Below content
+    card_content.grid_columnconfigure(0, weight=1)
+    card_content.grid_columnconfigure(1, weight=0)
+    card_content.grid_columnconfigure(2, weight=1)
+    
     # Header
     header_label = tk.Label(card_content, text="Login to RFID Printer", **config.HEADER_STYLE)
-    header_label.pack(pady=(0, 30))
+    header_label.grid(row=1, column=0, columnspan=3, pady=(0, 40), sticky='ew')
     
-    # Username field - horizontal layout
-    username_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
-    username_frame.pack(fill='x', pady=(0, 20))
+    # Username field
+    username_label = tk.Label(card_content, text="Username:", **config.LABEL_STYLE)
+    username_label.grid(row=2, column=0, sticky='e', padx=(0, 15), pady=10)
     
-    username_label = tk.Label(username_frame, text="Username:", **config.LABEL_STYLE)
-    username_label.pack(side='left', padx=(0, 15))
+    username_entry = config.create_fluent_entry(card_content, width=25)
+    username_entry.grid(row=2, column=1, sticky='ew', pady=10)
     
-    username_entry = config.create_fluent_entry(username_frame, width=25)
-    username_entry.pack(side='right', fill='x', expand=True)
+    # Password field
+    password_label = tk.Label(card_content, text="Password:", **config.LABEL_STYLE)
+    password_label.grid(row=3, column=0, sticky='e', padx=(0, 15), pady=10)
     
-    # Password field - horizontal layout
-    password_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
-    password_frame.pack(fill='x', pady=(0, 30))
-    
-    password_label = tk.Label(password_frame, text="Password:", **config.LABEL_STYLE)
-    password_label.pack(side='left', padx=(0, 15))
-    
-    password_entry = config.create_fluent_entry(password_frame, width=25, show="*")
-    password_entry.pack(side='right', fill='x', expand=True)
+    password_entry = config.create_fluent_entry(card_content, width=25, show="*")
+    password_entry.grid(row=3, column=1, sticky='ew', pady=10)
     
     # Login button
     def handle_login():
@@ -94,7 +95,7 @@ def show_login():
         command=handle_login,
         **config.BUTTON_STYLE
     )
-    login_button.pack(pady=(0, 10))
+    login_button.grid(row=4, column=0, columnspan=3, pady=(30, 10), sticky='')  # Centered across all columns
     
     # Bind Enter key to login
     login_window.bind('<Return>', handle_enter)
