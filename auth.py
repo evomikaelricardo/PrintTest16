@@ -9,19 +9,21 @@ import config
 current_user = None
 auth_token = None
 
+
 def api_auth_request(method, endpoint, headers=None, payload=None):
     """
     A function to handle authentication API requests.
     """
     url = endpoint  # Full URL is provided
-    headers = headers or {
-        "Content-Type": "application/json"
-    }
+    headers = headers or {"Content-Type": "application/json"}
     TIMEOUT = 10  # seconds
-    
+
     try:
         if method == "POST":
-            response = requests.post(url, json=payload, headers=headers, timeout=TIMEOUT)
+            response = requests.post(url,
+                                     json=payload,
+                                     headers=headers,
+                                     timeout=TIMEOUT)
         elif method == "GET":
             response = requests.get(url, headers=headers, timeout=TIMEOUT)
         else:
@@ -39,49 +41,50 @@ def api_auth_request(method, endpoint, headers=None, payload=None):
         logging.error(error_msg)
         return None
 
+
 def login(username, password):
     """
     Authenticate user with username and password via REST API.
     Returns True if successful, False otherwise.
     """
     global current_user, auth_token
-    
+
     endpoint = "https://mvdev.evosmartlife.net/api/ewms/login"
-    payload = {
-        "username": username,
-        "password": password
-    }
-    
+    payload = {"username": username, "password": password}
+
     logging.info(f"Attempting login for user: {username}")
-    
+
     response = api_auth_request("POST", endpoint, payload=payload)
-    
+
     if response and response.get("status_code") == 200:
         # Login successful
         current_user = username
-        
+
         # Handle both dict and list formats for data field
         data = response.get("data", {})
         if isinstance(data, list) and len(data) > 0:
             # If data is a list, get the first item
-            auth_token = data[0].get("access_token") if data[0] and isinstance(data[0], dict) else None
+            auth_token = data[0].get("access_token") if data[0] and isinstance(
+                data[0], dict) else None
         elif isinstance(data, dict):
             # If data is a dict, get access_token directly
             auth_token = data.get("access_token")
         else:
             auth_token = None
-            
+
         # Store access_token to API_TOKEN in config.py
         if auth_token:
             config.API_TOKEN = auth_token
-            
-        logging.info(f"Login successful for user: {username}, token extracted: {'Yes' if auth_token else 'No'}")
+
+        logging.info(
+            f"Login successful for user: {username}, token extracted: {'Yes' if auth_token else 'No'}"
+        )
         logging.debug(f"Response data structure: {type(data)} - {data}")
-        
+
         # Log both access_token and API_TOKEN values
         logging.info(f"access_token value: {auth_token}")
         logging.info(f"API_TOKEN value: {config.API_TOKEN}")
-        
+
         return True
     else:
         # Login failed
@@ -91,30 +94,29 @@ def login(username, password):
         logging.error(f"Login failed for user {username}: {error_message}")
         return False
 
+
 def logout():
     """
     Logout user via REST API.
     Returns True if successful, False otherwise.
     """
     global current_user, auth_token
-    
+
     endpoint = "https://mvdev.evosmartlife.net/api/ewms/logout"
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
+    headers = {"Content-Type": "application/json"}
+
     # Add authorization header if we have a token
     if auth_token:
         headers["Authorization"] = f"Bearer {auth_token}"
-    
+
     logging.info(f"Attempting logout for user: {current_user}")
-    
+
     response = api_auth_request("POST", endpoint, headers=headers)
-    
+
     # Clear local authentication state regardless of API response
     current_user = None
     auth_token = None
-    
+
     if response and response.get("status_code") == 200:
         logging.info("Logout successful")
         return True
@@ -123,17 +125,20 @@ def logout():
         logging.warning("Logout API call failed, but local state cleared")
         return True  # Return True since local state is cleared
 
+
 def is_authenticated():
     """
     Check if user is currently authenticated.
     """
     return current_user is not None
 
+
 def get_current_user():
     """
     Get the current authenticated user.
     """
     return current_user
+
 
 def get_auth_token():
     """
