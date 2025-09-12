@@ -94,9 +94,20 @@ def second_interface(root, po_number, warehouse_id, initial_items=None):
         image = generate_zpl_preview(zpl_filled)
         if image:
             preview_canvas.delete("all")  # Clear loading message
-            preview_image = ImageTk.PhotoImage(image)
-            preview_canvas.image = preview_image  # Keep a reference to avoid garbage collection
-            preview_canvas.create_image(0, 0, anchor="nw", image=preview_image)
+            try:
+                preview_image = ImageTk.PhotoImage(image)
+                # Store the image reference in the canvas to prevent garbage collection
+                preview_canvas.image = preview_image
+                preview_canvas.create_image(0, 0, anchor="nw", image=preview_image)
+            except Exception as e:
+                logging.error(f"Error creating preview image: {e}")
+                preview_canvas.create_text(
+                    165, 85, 
+                    text="Preview unavailable", 
+                    font=("Arial", 12), 
+                    fill="red",
+                    anchor="center"
+                )
 
     def is_valid_inventory_id(inventory_id):
         """

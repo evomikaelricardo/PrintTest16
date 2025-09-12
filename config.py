@@ -1,4 +1,4 @@
-import tkinter as tk, base64
+import tkinter as tk, base64, logging
 from io import BytesIO
 from PIL import Image, ImageTk
 
@@ -214,12 +214,17 @@ ICON_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAADAFBMVEUAcrxmq9fk8
 
 def get_icon_image():
     try:
+        if not ICON_BASE64:
+            return None
         data = base64.b64decode(ICON_BASE64)
         image = Image.open(BytesIO(data))
+        # Ensure the image is in a format compatible with Tkinter
+        if image.mode not in ('RGB', 'RGBA', 'L'):
+            image = image.convert('RGBA')
         return ImageTk.PhotoImage(image)
     except Exception as e:
         # Return None if icon loading fails - we'll handle this in the calling code
-        print(f"Warning: Could not load application icon: {e}")
+        logging.warning(f"Could not load application icon: {e}")
         return None
 
 # Function to create custom title bar
@@ -239,9 +244,9 @@ def add_custom_title_bar(window, title, bg_color="#005A9F"):
     # Add App Icon (if available)
     icon_image = get_icon_image()
     if icon_image:
-        icon_label = tk.Label(title_bar, bg=bg_color)
-        icon_label.configure(image=icon_image)  # type: ignore
-        icon_label.photo = icon_image  # type: ignore - Keep a reference to prevent garbage collection
+        icon_label = tk.Label(title_bar, bg=bg_color, image=icon_image)
+        # Store the image reference in the label to prevent garbage collection
+        icon_label.image = icon_image
         icon_label.pack(side="left", padx=5)
 
     # Title Label
