@@ -34,6 +34,13 @@ Preferred communication style: Simple, everyday language.
 - **Label Data**: Expiration dates, QR codes, and formatted text wrapping
 
 ## Security
+- **User Authentication**: Comprehensive authentication system requiring login before accessing any RFID functionality
+- **Protected Windows**: All RFID tag generation windows require successful authentication:
+  - "Generate RFID Tag (Step 1 of 2)" - Purchase Order selection
+  - "Generate RFID Tag (Step 2 of 2)" - Item selection and printing
+  - "Generate RFID tag (Select Printer)" - Printer selection dialog
+- **Multiple Entry Point Protection**: Authentication checks in both main.py and individual UI components
+- **Session Management**: Logout functionality that clears authentication state and returns to login
 - **API Authentication**: Bearer token-based authentication for REST API access
 - **Environment Configuration**: API tokens and URLs stored in configuration files
 - **Request Timeout**: 10-second timeout protection for API calls

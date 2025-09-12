@@ -64,6 +64,16 @@ def detect_printers():
 def select_printer(available_printers):
     global printer_name
     
+    # Check if user is authenticated before allowing access to printer selection
+    import auth
+    if not auth.is_authenticated():
+        from tkinter import messagebox
+        messagebox.showerror("Authentication Required", "You must login first to access the printer selection.")
+        # Import and show login instead of continuing
+        from ui.login_interface import show_login
+        show_login()
+        return None
+    
     if not available_printers:
         printer_name = "Virtual Zebra Printer"
         return printer_name
