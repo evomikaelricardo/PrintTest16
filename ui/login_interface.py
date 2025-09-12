@@ -35,19 +35,25 @@ def show_login():
     header_label = tk.Label(card_content, text="Login to RFID Printer", **config.HEADER_STYLE)
     header_label.pack(pady=(0, 30))
     
-    # Username field
-    username_label = tk.Label(card_content, text="Username:", **config.LABEL_STYLE)
-    username_label.pack(anchor='w', pady=(0, 5))
+    # Username field - horizontal layout
+    username_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
+    username_frame.pack(fill='x', pady=(0, 20))
     
-    username_entry = config.create_fluent_entry(card_content, width=40)
-    username_entry.pack(fill='x', pady=(0, 20))
+    username_label = tk.Label(username_frame, text="Username:", **config.LABEL_STYLE)
+    username_label.pack(side='left', padx=(0, 15))
     
-    # Password field
-    password_label = tk.Label(card_content, text="Password:", **config.LABEL_STYLE)
-    password_label.pack(anchor='w', pady=(0, 5))
+    username_entry = config.create_fluent_entry(username_frame, width=25)
+    username_entry.pack(side='right', fill='x', expand=True)
     
-    password_entry = config.create_fluent_entry(card_content, width=40, show="*")
-    password_entry.pack(fill='x', pady=(0, 30))
+    # Password field - horizontal layout
+    password_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
+    password_frame.pack(fill='x', pady=(0, 30))
+    
+    password_label = tk.Label(password_frame, text="Password:", **config.LABEL_STYLE)
+    password_label.pack(side='left', padx=(0, 15))
+    
+    password_entry = config.create_fluent_entry(password_frame, width=25, show="*")
+    password_entry.pack(side='right', fill='x', expand=True)
     
     # Login button
     def handle_login():
