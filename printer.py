@@ -92,10 +92,16 @@ def select_printer(available_printers):
 
     window_width = 700
     window_height = 650
-    config.center_window(printer_window, window_width, window_height, "Generate RFID Tag (Select Printer)")
+    result = config.center_window(printer_window, window_width, window_height, "Generate RFID Tag (Select Printer)", show_menu=True)
 
     # Configure background to match main window
     printer_window.configure(bg=config.BACKGROUND_COLOR)
+    
+    # Connect menu button functionality if menu was created
+    if result and isinstance(result, tuple) and len(result) == 2:
+        title_bar, menu_button = result
+        from ui.login_interface import show_logout_menu
+        menu_button.config(command=lambda: show_logout_menu(printer_window, menu_button))
     
     # Main container with padding
     main_container = tk.Frame(printer_window, bg=config.BACKGROUND_COLOR)
