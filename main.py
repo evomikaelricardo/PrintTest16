@@ -9,7 +9,6 @@ import auth
 if __name__ == "__main__":
     # Check if user is authenticated before allowing access to any RFID functionality
     if not auth.is_authenticated():
-        messagebox.showerror("Authentication Required", "You must login first to access the RFID tag generation system.")
         # Import and show login instead of continuing
         from ui.login_interface import show_login
         show_login()

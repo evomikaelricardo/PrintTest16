@@ -67,8 +67,6 @@ def select_printer(available_printers):
     # Check if user is authenticated before allowing access to printer selection
     import auth
     if not auth.is_authenticated():
-        from tkinter import messagebox
-        messagebox.showerror("Authentication Required", "You must login first to access the printer selection.")
         # Import and show login instead of continuing
         from ui.login_interface import show_login
         show_login()
