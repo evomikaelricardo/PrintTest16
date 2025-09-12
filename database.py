@@ -23,7 +23,7 @@ def api_request(method, endpoint, headers=None, payload=None, params=None):
     global error_msg    
     url = f"{BASE_URL}{endpoint}"
     headers = headers or {
-        "Authorization": f"Bearer {API_TOKEN}",
+        "Authorization": f"Bearer {config.auth_token or API_TOKEN}",
         "Content-Type": "application/json"
     }
     TIMEOUT = 10  # seconds

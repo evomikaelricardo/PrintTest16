@@ -6,8 +6,8 @@ from database import login_user, get_err_msg
 class LoginScreen:
     def __init__(self):
         self.window = None
-        self.username_entry = tk.Entry()
-        self.password_entry = tk.Entry()
+        self.username_entry = None
+        self.password_entry = None
         self.login_successful = False
         
     def show_login(self):
@@ -39,13 +39,13 @@ class LoginScreen:
         header_frame = tk.Frame(card_content, bg=config.CARD_COLOR)
         header_frame.pack(fill='x', pady=(0, 30))
         
-        # App icon and title
-        app_icon = config.get_icon_image()
-        if app_icon:
-            icon_label = tk.Label(header_frame, bg=config.CARD_COLOR)
-            icon_label.configure(image=app_icon)
-            icon_label.photo = app_icon  # Keep reference
-            icon_label.pack(pady=(0, 10))
+        # App icon and title - skip icon to avoid Tkinter image issues in VNC
+        # app_icon = config.get_icon_image()
+        # if app_icon:
+        #     icon_label = tk.Label(header_frame, bg=config.CARD_COLOR)
+        #     icon_label.configure(image=app_icon)
+        #     icon_label.photo = app_icon  # Keep reference
+        #     icon_label.pack(pady=(0, 10))
         
         title_label = tk.Label(
             header_frame,
