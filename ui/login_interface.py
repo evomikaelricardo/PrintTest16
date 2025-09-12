@@ -74,7 +74,7 @@ def show_login():
         password = password_entry.get().strip()
         
         if not username or not password:
-            messagebox.showwarning("Login Required", "Please enter both username and password.")
+            config.show_custom_message(login_window, "Login Required", "Please enter both username and password.", "warning")
             return
         
         # Disable login button and show loading state
@@ -89,7 +89,7 @@ def show_login():
                 start_main_application()
             else:
                 # Login failed
-                messagebox.showerror("Login Failed", "Invalid username or password. Please try again.")
+                config.show_custom_message(login_window, "Login Failed", "Invalid username or password. Please try again.", "error")
                 password_entry.delete(0, tk.END)  # Clear password field
         finally:
             # Restore login button state if window still exists
