@@ -232,14 +232,15 @@ def get_icon_image():
         return None
 
 # Function to create custom title bar
-def add_custom_title_bar(window, title, bg_color="#005A9F"):
+def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     """
     Adds a custom title bar to a Tkinter window.
 
     Args:
         window (tk.Tk or tk.Toplevel): The Tkinter window to add the custom title bar to.
         title (str): The title to display on the title bar.
-        bg_color (str): The background color of the title bar. Default is "#036AC1".
+        bg_color (str): The background color of the title bar. Default is "#005A9F".
+        show_menu (bool): Whether to show the menu button in the title bar.
     """
     # Custom Title Bar
     title_bar = tk.Frame(window, bg=bg_color, relief="raised", bd=0)
@@ -257,30 +258,40 @@ def add_custom_title_bar(window, title, bg_color="#005A9F"):
     title_label = tk.Label(title_bar, text=title, bg=bg_color, fg="white", font=("Arial", 12, "bold"))
     title_label.pack(side="left", padx=10)
 
-    # Close Button removed - app exit is now handled through menu
+    # Menu Button (integrated into title bar)
+    if show_menu:
+        menu_button = tk.Button(
+            title_bar,
+            text="☰",  # Hamburger menu icon
+            font=("Arial", 14),
+            bg=bg_color,
+            fg="white",
+            bd=0,
+            relief='flat',
+            padx=8,
+            pady=4,
+            cursor="hand2",
+            activebackground=PRIMARY_HOVER,
+            activeforeground="white"
+        )
+        menu_button.pack(side="right", padx=10)
+        return title_bar, menu_button
     
     # Variables to store drag offset (use a dictionary to avoid conflicts)
     drag_data = {"offset_x": 0, "offset_y": 0, "dragging": False}
 
     # Functions to Move the Window
     def start_move(event):
-        #window.x = event.x
-        #window.y = event.y
         """Store the offset when starting to drag"""
         drag_data["offset_x"] = event.x_root - window.winfo_x()
         drag_data["offset_y"] = event.y_root - window.winfo_y()
         drag_data["dragging"] = True
 
     def stop_move(event):
-        #window.x = None
-        #window.y = None
         """Stop dragging"""
         drag_data["dragging"] = False
 
     def on_motion(event):
-        #x = (event.x_root - window.x)
-        #y = (event.y_root - window.y)
-        #window.geometry(f"+{x}+{y}")
         """Move the window during drag"""
         if drag_data["dragging"]:
             x = event.x_root - drag_data["offset_x"]
@@ -290,9 +301,11 @@ def add_custom_title_bar(window, title, bg_color="#005A9F"):
     title_bar.bind("<Button-1>", start_move)
     title_bar.bind("<ButtonRelease-1>", stop_move)
     title_bar.bind("<B1-Motion>", on_motion)
+    
+    return title_bar
 
 # Default Function to center align the window of the UI
-def center_window(window, width, height, title=None):
+def center_window(window, width, height, title=None, show_menu=False):
     """
     Centers a Tkinter window on the screen.
 
@@ -301,6 +314,7 @@ def center_window(window, width, height, title=None):
         width (int): The width of the window.
         height (int): The height of the window.
         title (str, optional): The title of the custom window. If None, skips custom styling.
+        show_menu (bool): Whether to show the integrated menu button in the title bar.
     """
     window.resizable(False, False)  # Locks the window geometry
 
@@ -315,4 +329,4 @@ def center_window(window, width, height, title=None):
         window.configure(bg='white')  # Change the background color using configure
         window.config(highlightbackground="black", highlightthickness=2)  # Add a black border
         window.overrideredirect(True)  # Override default window header
-        add_custom_title_bar(window, title)
+        return add_custom_title_bar(window, title, show_menu=show_menu)

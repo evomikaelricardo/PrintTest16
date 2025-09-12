@@ -18,14 +18,16 @@ def main(initial_po_numbers=None):
     root = tk.Tk()
     window_width = 700
     window_height = 650
-    config.center_window(root, window_width, window_height, "Generate RFID Tag (Step 1 of 2)") # Use config.center_window
-
+    result = config.center_window(root, window_width, window_height, "Generate RFID Tag (Step 1 of 2)", show_menu=True)
+    
     # Configure root background
     root.configure(bg=config.BACKGROUND_COLOR)
     
-    # Add logout menu to top left corner
-    from ui.login_interface import add_logout_menu
-    add_logout_menu(root)
+    # Connect menu button functionality if menu was created
+    if result and isinstance(result, tuple) and len(result) == 2:
+        title_bar, menu_button = result
+        from ui.login_interface import show_logout_menu
+        menu_button.config(command=lambda: show_logout_menu(root, menu_button))
 
     # Variables
     selected_po = tk.StringVar()

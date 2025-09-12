@@ -356,12 +356,14 @@ def second_interface(root, po_number, warehouse_id, initial_items=None):
     next_window = tk.Tk()
     window_width = 700
     window_height = 650
-    center_window(next_window, window_width, window_height, "Generate RFID Tag (Step 2 of 2)")
+    result = center_window(next_window, window_width, window_height, "Generate RFID Tag (Step 2 of 2)", show_menu=True)
     next_window.configure(bg=config.BACKGROUND_COLOR)
     
-    # Add logout menu to top left corner
-    from ui.login_interface import add_logout_menu
-    add_logout_menu(next_window)
+    # Connect menu button functionality if menu was created
+    if result and isinstance(result, tuple) and len(result) == 2:
+        title_bar, menu_button = result
+        from ui.login_interface import show_logout_menu
+        menu_button.config(command=lambda: show_logout_menu(next_window, menu_button))
 
     # Main container
     main_container = tk.Frame(next_window, bg=config.BACKGROUND_COLOR)

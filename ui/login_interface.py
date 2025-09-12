@@ -149,31 +149,7 @@ def start_main_application():
         # Return to login on error
         show_login()
 
-def add_logout_menu(window):
-    """
-    Add a menu icon with logout functionality to the top right corner of a window.
-    """
-    # Create menu frame in top right
-    menu_frame = tk.Frame(window, bg=config.CARD_COLOR if hasattr(config, 'CARD_COLOR') else 'white')
-    menu_frame.place(relx=1.0, y=10, x=-10, anchor='ne')  # Position in top right corner
-    
-    # Menu icon button (using a simple text-based icon)
-    menu_button = tk.Button(
-        menu_frame,
-        text="☰",  # Hamburger menu icon
-        font=("Arial", 14),
-        bg=config.SECONDARY_COLOR if hasattr(config, 'SECONDARY_COLOR') else '#323130',
-        fg='white',
-        bd=0,
-        relief='flat',
-        padx=8,
-        pady=4,
-        cursor="hand2",
-        command=lambda: show_logout_menu(window, menu_button)
-    )
-    menu_button.pack()
-    
-    return menu_frame
+# Old add_logout_menu function removed - now integrated into title bar
 
 def show_logout_menu(parent_window, menu_button):
     """
