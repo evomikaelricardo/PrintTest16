@@ -6,19 +6,9 @@ from PIL import Image, ImageTk
 last_exp_date = None
 printer_name = None
 
-# Base URL & API configuration for MVDEV - dev & staging
+# Base URL & API TOKEN for MVDEV - dev & staging
 BASE_URL = "https://mvdev.evosmartlife.net"
-API_PREFIX_GENERAL = "/api/ewms"
 API_TOKEN = "effa790443630eb70428416b28d5f720ce21818e8c7d76c5244819102e9a9fd7"
-
-# Authentication endpoints
-LOGIN_ENDPOINT = API_PREFIX_GENERAL + "/login"
-LOGOUT_ENDPOINT = API_PREFIX_GENERAL + "/logout"
-
-# Authentication state
-is_authenticated = False
-current_user = None
-auth_token = None
 
 # Windows Fluent UI color palette
 PRIMARY_COLOR = "#005A9F"  # Fluent Blue

@@ -61,43 +61,9 @@ def main(initial_po_numbers=None):
     # Use pre-fetched PO numbers if available, otherwise fetch them
     po_numbers = initial_po_numbers if initial_po_numbers is not None else fetch_po_number()
 
-    # Top header with user info and logout
-    header_frame = tk.Frame(root, bg=config.BACKGROUND_COLOR)
-    header_frame.pack(fill='x', padx=50, pady=(20, 0))
-    
-    # User info and logout button
-    user_info_frame = tk.Frame(header_frame, bg=config.BACKGROUND_COLOR)
-    user_info_frame.pack(fill='x')
-    
-    # Welcome text
-    welcome_text = f"Welcome, {config.current_user or 'User'}"
-    welcome_label = tk.Label(
-        user_info_frame,
-        text=welcome_text,
-        font=config.FONT_BODY,
-        bg=config.BACKGROUND_COLOR,
-        fg=config.SECONDARY_COLOR
-    )
-    welcome_label.pack(side='left')
-    
-    # Logout button
-    def handle_logout():
-        from database import logout_user
-        if logout_user():
-            messagebox.showinfo("Logged Out", "You have been logged out successfully.")
-        root.quit()  # Exit the application after logout
-        
-    logout_button = tk.Button(
-        user_info_frame,
-        text="Logout",
-        command=handle_logout,
-        **config.SECONDARY_BUTTON_STYLE
-    )
-    logout_button.pack(side='right')
-    
     # Main container with padding
     main_container = tk.Frame(root, bg=config.BACKGROUND_COLOR)
-    main_container.pack(fill='both', expand=True, padx=50, pady=(30, 50))
+    main_container.pack(fill='both', expand=True, padx=50, pady=50)
 
 
     # PO Selection Card

@@ -1,6 +1,5 @@
 import requests, logging
-import config
-from config import BASE_URL, API_TOKEN, LOGIN_ENDPOINT, LOGOUT_ENDPOINT
+from config import BASE_URL, API_TOKEN
 
 # Configure logging
 logging.basicConfig(
@@ -23,7 +22,7 @@ def api_request(method, endpoint, headers=None, payload=None, params=None):
     global error_msg    
     url = f"{BASE_URL}{endpoint}"
     headers = headers or {
-        "Authorization": f"Bearer {config.auth_token or API_TOKEN}",
+        "Authorization": f"Bearer {API_TOKEN}",
         "Content-Type": "application/json"
     }
     TIMEOUT = 10  # seconds
@@ -136,89 +135,3 @@ def fetch_warehouse():
         return warehouse_map
     else:
         return []
-
-# Authentication functions
-def login_user(username, password):
-    """
-    Authenticate user with username and password
-    Returns True if login successful, False otherwise
-    """
-    global error_msg
-    endpoint = LOGIN_ENDPOINT
-    
-    payload = {
-        "username": username,
-        "password": password
-    }
-    
-    # Use different headers for login (no Bearer token needed)
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
-    data = api_request("POST", endpoint, headers=headers, payload=payload)
-    
-    if data and data.get("status_code") == 200:
-        # Login successful - update authentication state
-        if "token" in data:
-            config.auth_token = data["token"]
-        if "user" in data:
-            config.current_user = data["user"]
-        
-        config.is_authenticated = True
-        logging.info(f"User \"{username}\" logged in successfully")
-        return True
-    else:
-        # Login failed
-        config.is_authenticated = False
-        config.current_user = None
-        config.auth_token = None
-        logging.warning(f"Login failed for user \"{username}\"")
-        return False
-
-def logout_user():
-    """
-    Logout current user
-    Returns True if logout successful, False otherwise
-    """
-    global error_msg
-    endpoint = LOGOUT_ENDPOINT
-    
-    if not config.is_authenticated:
-        return True  # Already logged out
-    
-    # Use authenticated headers for logout
-    headers = {
-        "Authorization": f"Bearer {config.auth_token or API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    
-    data = api_request("POST", endpoint, headers=headers)
-    
-    # Clear authentication state regardless of API response
-    config.is_authenticated = False
-    config.current_user = None
-    config.auth_token = None
-    
-    if data and data.get("status_code") == 200:
-        logging.info("User logged out successfully")
-        return True
-    else:
-        logging.warning("Logout API call failed, but local session cleared")
-        return False
-
-def get_authenticated_headers():
-    """
-    Get headers with authentication token for API requests
-    """
-    if config.is_authenticated and config.auth_token:
-        return {
-            "Authorization": f"Bearer {config.auth_token}",
-            "Content-Type": "application/json"
-        }
-    else:
-        # Fallback to the original API token
-        return {
-            "Authorization": f"Bearer {API_TOKEN}",
-            "Content-Type": "application/json"
-        }
