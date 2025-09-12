@@ -257,19 +257,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F"):
     title_label = tk.Label(title_bar, text=title, bg=bg_color, fg="white", font=("Arial", 12, "bold"))
     title_label.pack(side="left", padx=10)
 
-    # Close Button
-    close_button = tk.Button(
-        title_bar,
-        text="X",
-        command=window.destroy,
-        bg=bg_color,
-        fg="white",
-        font=("Arial", 10, "bold"),
-        bd=0,
-        activebackground="red",
-        activeforeground="white",
-    )
-    close_button.pack(side="right", padx=5)
+    # Close Button removed - app exit is now handled through menu
     
     # Variables to store drag offset (use a dictionary to avoid conflicts)
     drag_data = {"offset_x": 0, "offset_y": 0, "dragging": False}

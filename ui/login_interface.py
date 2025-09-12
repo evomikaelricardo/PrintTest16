@@ -151,11 +151,11 @@ def start_main_application():
 
 def add_logout_menu(window):
     """
-    Add a menu icon with logout functionality to the bottom left corner of a window.
+    Add a menu icon with logout functionality to the top right corner of a window.
     """
-    # Create menu frame in bottom left
+    # Create menu frame in top right
     menu_frame = tk.Frame(window, bg=config.CARD_COLOR if hasattr(config, 'CARD_COLOR') else 'white')
-    menu_frame.place(x=10, rely=1.0, y=-10, anchor='sw')  # Position in bottom left corner
+    menu_frame.place(relx=1.0, y=10, x=-10, anchor='ne')  # Position in top right corner
     
     # Menu icon button (using a simple text-based icon)
     menu_button = tk.Button(
@@ -182,10 +182,11 @@ def show_logout_menu(parent_window, menu_button):
     # Create popup menu
     menu = tk.Menu(parent_window, tearoff=0)
     menu.add_command(label="Logout", command=lambda: handle_logout(parent_window))
+    menu.add_command(label="Exit", command=lambda: handle_exit(parent_window))
     
-    # Show menu above the button (since button is now at bottom)
+    # Show menu below the button (since button is now at top)
     x = menu_button.winfo_rootx()
-    y = menu_button.winfo_rooty() - 30  # Show above the button
+    y = menu_button.winfo_rooty() + 30  # Show below the button
     menu.tk_popup(x, y)
 
 def handle_logout(current_window):
@@ -202,3 +203,13 @@ def handle_logout(current_window):
         
         # Show login window again
         show_login()
+
+def handle_exit(current_window):
+    """
+    Handle app exit process.
+    """
+    # Confirm exit
+    if messagebox.askyesno("Exit Application", "Are you sure you want to exit the application?"):
+        # Close the application completely
+        current_window.quit()
+        current_window.destroy()
