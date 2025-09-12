@@ -11,8 +11,8 @@ def show_login():
     Display the login window.
     """
     login_window = tk.Tk()
-    window_width = 600
-    window_height = 550
+    window_width = 500
+    window_height = 500
     config.center_window(login_window, window_width, window_height, "EVO RFID Printer - Login")
     
     # Configure background
@@ -34,13 +34,13 @@ def show_login():
     # Configure grid weights for proper centering
     card_content.grid_rowconfigure(0, weight=1)  # Above content
     card_content.grid_rowconfigure(5, weight=1)  # Below content
-    card_content.grid_columnconfigure(0, weight=0, minsize=120)  # Fixed width for labels
-    card_content.grid_columnconfigure(1, weight=1, minsize=250)  # Expandable for entries
-    card_content.grid_columnconfigure(2, weight=0, minsize=50)   # Right margin
+    card_content.grid_columnconfigure(0, weight=1)
+    card_content.grid_columnconfigure(1, weight=0)
+    card_content.grid_columnconfigure(2, weight=1)
     
     # Header
-    header_label = tk.Label(card_content, text="Please Enter Your Credentials to Continue", **config.HEADER_STYLE)
-    header_label.grid(row=1, column=0, columnspan=3, pady=(10, 40), sticky='ew')
+    header_label = tk.Label(card_content, text="Login to RFID Printer", **config.HEADER_STYLE)
+    header_label.grid(row=1, column=0, columnspan=3, pady=(0, 40), sticky='ew')
     
     # Username field
     username_label = tk.Label(card_content, text="Username:", **config.LABEL_STYLE)
@@ -95,7 +95,7 @@ def show_login():
         command=handle_login,
         **config.BUTTON_STYLE
     )
-    login_button.grid(row=4, column=1, pady=(30, 10), sticky='ew', padx=20)  # Aligned with textboxes
+    login_button.grid(row=4, column=0, columnspan=3, pady=(30, 10), sticky='')  # Centered across all columns
     
     # Bind Enter key to login
     login_window.bind('<Return>', handle_enter)
