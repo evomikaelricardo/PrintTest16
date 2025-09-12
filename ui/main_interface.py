@@ -4,9 +4,18 @@ from database import fetch_po_number, fetch_warehouse, fetch_items
 import config # Import the config module directly
 # from config import center_window, BUTTON_STYLE, HEADER_STYLE # Removed specific imports
 from ui.ui_item_selection import second_interface
+import auth
 
 # Main Interface to start the program + PO Number Selector
 def main(initial_po_numbers=None):
+    # Check if user is authenticated before allowing access
+    if not auth.is_authenticated():
+        messagebox.showerror("Authentication Required", "You must login first to access this feature.")
+        # Import and show login instead of continuing
+        from ui.login_interface import show_login
+        show_login()
+        return
+    
     root = tk.Tk()
     window_width = 700
     window_height = 650

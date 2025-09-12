@@ -12,6 +12,7 @@ import re
 import threading
 import config # Import the config module to access colors and fonts
 import platform
+import auth
 
 # Define variables to track the debounce timers
 debounce_timer = None
@@ -30,6 +31,16 @@ def generate_tag_ids(amount):
 # Function to handle Item Selection UI
 def second_interface(root, po_number, warehouse_id, initial_items=None):
     global last_exp_date
+    
+    # Check if user is authenticated before allowing access
+    if not auth.is_authenticated():
+        root.destroy()  # Close the previous window
+        messagebox.showerror("Authentication Required", "You must login first to access this feature.")
+        # Import and show login instead of continuing
+        from ui.login_interface import show_login
+        show_login()
+        return
+    
     root.destroy()
 
     # Lazy import to avoid circular dependency
