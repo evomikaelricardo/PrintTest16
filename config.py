@@ -8,7 +8,7 @@ printer_name = None
 
 # Base URL & API TOKEN for MVDEV - dev & staging
 BASE_URL = "https://mvdev.evosmartlife.net"
-API_TOKEN = "notavailableyet"
+API_TOKEN = None
 
 # Authentication endpoints
 LOGIN_ENDPOINT = "/api/ewms/login"
