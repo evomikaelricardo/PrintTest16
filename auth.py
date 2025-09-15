@@ -81,10 +81,6 @@ def login(username, password):
         )
         logging.debug(f"Response data structure: {type(data)} - {data}")
 
-        # Log both access_token and API_TOKEN values
-        logging.info(f"access_token value: {auth_token}")
-        logging.info(f"API_TOKEN value: {config.API_TOKEN}")
-
         return True
     else:
         # Login failed
