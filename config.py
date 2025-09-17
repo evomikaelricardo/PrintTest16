@@ -462,7 +462,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     # Minimize Button (_) - left of menu/close buttons
     minimize_button = tk.Button(
         title_bar,
-        text="-",  # Minimize icon
+        text=" - ",  # Minimize icon
         font=("Arial", 14, "bold"),
         bg=bg_color,
         fg="white",
