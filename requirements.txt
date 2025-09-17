@@ -2,7 +2,3 @@ requests
 pillow
 tkcalendar
 python-decouple
-pillow
-python-decouple
-requests
-tkcalendar

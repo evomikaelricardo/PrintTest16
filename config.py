@@ -252,7 +252,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     if icon_image:
         icon_label = tk.Label(title_bar, bg=bg_color, image=icon_image)
         # Store the image reference in the label to prevent garbage collection
-        icon_label.image = icon_image
+        icon_label._image_ref = icon_image
         icon_label.pack(side="left", padx=5)
 
     # Title Label
