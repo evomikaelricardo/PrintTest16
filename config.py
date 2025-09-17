@@ -217,17 +217,30 @@ SUBHEADER_STYLE = {"font": FONT_SUBHEADER, "bg": CARD_COLOR, "fg": "#374151"}
 ICON_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAADAFBMVEUAcrxmq9fk8Piy1esvjMnz+PwNecAAcrz///8AcrxToNIbgcSax+XT5/TE3/B/uN49lM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzHvxgAAAACHRSTlPy////////5ZXmvn8AAABdSURBVHicXY5RDsAgCEONIivOef/jDnUirh8leQHaIKdCGCNCxRugCak/BhjIQId2QohS3Q+BtOafKqEjBQya6EuBbiQ4ME6QPCjqeYN7eDWQscxSus4ehVePn64XPfQHhymZj4gAAAAASUVORK5CYII="
 
 def get_icon_image():
+    """Load the EVO logo for popup window title bars (uses same image as taskbar)"""
     try:
-        if not ICON_BASE64:
+        import os
+        # Load the same uploaded EVO logo as used for taskbar
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "attached_assets", "EVOlogoInverse32x32_1758093354058.png")
+        
+        if not os.path.exists(image_path):
+            print(f"EVO logo file does not exist at: {image_path}")
             return None
-        data = base64.b64decode(ICON_BASE64)
-        image = Image.open(BytesIO(data))
-        # Ensure the image is in a format compatible with Tkinter
-        if image.mode not in ('RGB', 'RGBA', 'L'):
+            
+        image = Image.open(image_path)
+        
+        # Convert to RGBA for better compatibility
+        if image.mode != 'RGBA':
             image = image.convert('RGBA')
+        
+        # Ensure it's 32x32 for title bar use
+        if image.size != (32, 32):
+            image = image.resize((32, 32), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+        
         return ImageTk.PhotoImage(image)
     except Exception as e:
-        # Return None if icon loading fails - we'll handle this in the calling code
+        print(f"Error loading EVO logo for title bar: {e}")
         logging.warning(f"Could not load application icon: {e}")
         return None
 
@@ -237,7 +250,7 @@ def get_evo_logo_icon():
         import os
         # Load the uploaded EVO logo with absolute path
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "attached_assets", "EVOlogo32x32_1758091850863.png")
+        image_path = os.path.join(current_dir, "attached_assets", "EVOlogoInverse32x32_1758093354058.png")
         
         print(f"Loading EVO logo from: {image_path}")
         if not os.path.exists(image_path):
@@ -265,7 +278,7 @@ def get_evo_logo_icon():
         print("Successfully created PhotoImage for EVO logo")
         
         # Save as ICO file for Windows taskbar compatibility
-        ico_path = os.path.join(current_dir, "attached_assets", "evo_logo.ico")
+        ico_path = os.path.join(current_dir, "attached_assets", "evo_logo_inverse.ico")
         try:
             # Save multiple sizes in ICO format
             images[0].save(ico_path, format='ICO', sizes=[(16,16), (32,32), (48,48), (64,64)])
