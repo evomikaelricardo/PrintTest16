@@ -423,6 +423,14 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         command=close_window
     )
     close_button.pack(side="right", padx=(0, 5))
+    
+    # Add hover effects for close button
+    def close_button_hover_enter(event):
+        close_button.configure(bg="#D13438")  # Red hover
+    def close_button_hover_leave(event):
+        close_button.configure(bg=bg_color)
+    close_button.bind("<Enter>", close_button_hover_enter)
+    close_button.bind("<Leave>", close_button_hover_leave)
 
     # Menu Button (integrated into title bar) - middle right
     menu_button = None
@@ -442,6 +450,14 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
             activeforeground="white"
         )
         menu_button.pack(side="right", padx=5)
+        
+        # Add hover effects for menu button
+        def menu_button_hover_enter(event):
+            menu_button.configure(bg="#87CEEB")  # Light blue hover
+        def menu_button_hover_leave(event):
+            menu_button.configure(bg=bg_color)
+        menu_button.bind("<Enter>", menu_button_hover_enter)
+        menu_button.bind("<Leave>", menu_button_hover_leave)
 
     # Minimize Button (_) - left of menu/close buttons
     minimize_button = tk.Button(
@@ -460,6 +476,14 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         command=minimize_window
     )
     minimize_button.pack(side="right", padx=5)
+    
+    # Add hover effects for minimize button
+    def minimize_button_hover_enter(event):
+        minimize_button.configure(bg="#87CEEB")  # Light blue hover
+    def minimize_button_hover_leave(event):
+        minimize_button.configure(bg=bg_color)
+    minimize_button.bind("<Enter>", minimize_button_hover_enter)
+    minimize_button.bind("<Leave>", minimize_button_hover_leave)
     
     if show_menu:
         return title_bar, menu_button
