@@ -236,7 +236,7 @@ def get_icon_image():
         
         # Ensure it's 32x32 for title bar use
         if image.size != (32, 32):
-            image = image.resize((32, 32), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+            image = image.resize((32, 32), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
         
         return ImageTk.PhotoImage(image)
     except Exception as e:
@@ -269,7 +269,7 @@ def get_evo_logo_icon():
         images = []
         
         for size in sizes:
-            resized = image.resize(size, Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+            resized = image.resize(size, Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
             images.append(resized)
         
         # Create PhotoImage from the 32x32 version for Tkinter
