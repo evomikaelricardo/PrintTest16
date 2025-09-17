@@ -232,7 +232,7 @@ def get_icon_image():
         return None
 
 def get_evo_logo_icon():
-    """Load the EVO logo for window icon"""
+    """Load the EVO logo for window icon with Windows 11 taskbar compatibility"""
     try:
         import os
         # Load the uploaded EVO logo with absolute path
@@ -251,18 +251,36 @@ def get_evo_logo_icon():
         if image.mode != 'RGBA':
             image = image.convert('RGBA')
         
-        # Resize to 32x32 if necessary 
-        if image.size != (32, 32):
-            image = image.resize((32, 32), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
-            print(f"Resized image to: {image.size}")
+        # Create multiple sizes for better Windows compatibility
+        sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
+        images = []
         
-        photo = ImageTk.PhotoImage(image)
+        for size in sizes:
+            resized = image.resize(size, Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+            images.append(resized)
+        
+        # Create PhotoImage from the 32x32 version for Tkinter
+        main_image = images[1]  # 32x32
+        photo = ImageTk.PhotoImage(main_image)
         print("Successfully created PhotoImage for EVO logo")
-        return photo
+        
+        # Save as ICO file for Windows taskbar compatibility
+        ico_path = os.path.join(current_dir, "attached_assets", "evo_logo.ico")
+        try:
+            # Save multiple sizes in ICO format
+            images[0].save(ico_path, format='ICO', sizes=[(16,16), (32,32), (48,48), (64,64)])
+            print(f"Saved ICO file at: {ico_path}")
+            
+            # Return both the PhotoImage and ICO path
+            return photo, ico_path
+        except Exception as ico_e:
+            print(f"Could not save ICO file: {ico_e}")
+            return photo, None
+        
     except Exception as e:
         print(f"Error loading EVO logo icon: {e}")
         logging.warning(f"Could not load EVO logo icon: {e}")
-        return None
+        return None, None
 
 # Function to create custom title bar
 def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
@@ -345,41 +363,20 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
                 window.destroy()
     
     def minimize_window():
-        """Minimize the window - Windows 11 compatible"""
+        """Minimize the window - Windows 11 compatible with enhanced taskbar icon support"""
         try:
-            # Load and set the EVO logo as window icon before minimizing
-            print("Minimize button clicked - setting EVO logo as window icon")
+            print("Minimize button clicked - ensuring EVO logo is set for taskbar")
             
-            # Cache the icon if not already cached
-            if not hasattr(window, '_evo_icon_cached'):
-                window._evo_icon_cached = get_evo_logo_icon()
-            
-            evo_icon = window._evo_icon_cached
-            if evo_icon:
-                try:
-                    print("Setting EVO logo via iconphoto...")
-                    window.iconphoto(True, evo_icon)
-                    
-                    # Also try wm_iconphoto as a fallback
-                    try:
-                        window.wm_iconphoto(True, evo_icon)
-                        print("Successfully set icon via wm_iconphoto")
-                    except Exception as wm_e:
-                        print(f"wm_iconphoto failed: {wm_e}")
-                        
-                except Exception as icon_e:
-                    print(f"Could not set EVO logo as window icon: {icon_e}")
-                    logging.warning(f"Could not set EVO logo as window icon: {icon_e}")
-            else:
-                print("No EVO icon loaded - skipping icon setting")
+            # Re-apply the EVO logo with all methods for Windows 11 taskbar compatibility
+            set_window_evo_icon(window)
             
             # Step 1: Temporarily disable overrideredirect to allow window manager control
             window.overrideredirect(False)
-            # Step 2: Update to ensure changes take effect
+            # Step 2: Update to ensure changes take effect  
             window.update_idletasks()
             # Step 3: Minimize to taskbar
             window.state('iconic')
-            print("Window minimized")
+            print("Window minimized with EVO logo applied")
         except Exception as e:
             print(f"Minimize error: {e}")
     
@@ -457,26 +454,60 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         return title_bar
 
 def set_window_evo_icon(window):
-    """Set the EVO logo as the window icon"""
+    """Set the EVO logo as the window icon with Windows 11 taskbar support"""
     try:
-        print("Setting EVO logo as window icon...")
-        # Cache the icon if not already cached
+        print("Setting EVO logo as window icon with Windows 11 taskbar support...")
+        # Cache the icon and ICO path if not already cached
         if not hasattr(window, '_evo_icon_cached'):
-            window._evo_icon_cached = get_evo_logo_icon()
+            result = get_evo_logo_icon()
+            if result and len(result) == 2:
+                window._evo_icon_cached, window._evo_ico_path = result
+            else:
+                window._evo_icon_cached, window._evo_ico_path = None, None
         
         evo_icon = window._evo_icon_cached
+        ico_path = window._evo_ico_path
+        
         if evo_icon:
-            try:
-                # Try multiple methods to set the icon
-                window.iconphoto(True, evo_icon)
-                print("Successfully set EVO logo via iconphoto")
-            except Exception as e:
-                print(f"iconphoto failed: {e}")
+            success = False
+            
+            # Method 1: Try ICO file for Windows taskbar compatibility
+            if ico_path:
+                try:
+                    print(f"Trying to set icon from ICO file: {ico_path}")
+                    window.iconbitmap(ico_path)
+                    print("Successfully set EVO logo via iconbitmap (ICO file)")
+                    success = True
+                except Exception as ico_e:
+                    print(f"iconbitmap failed (expected in non-Windows environments): {ico_e}")
+            
+            # Method 2: Try standard iconphoto method
+            if not success:
+                try:
+                    window.iconphoto(True, evo_icon)
+                    print("Successfully set EVO logo via iconphoto")
+                    success = True
+                except Exception as e:
+                    print(f"iconphoto failed: {e}")
+            
+            # Method 3: Try wm_iconphoto as fallback
+            if not success:
                 try:
                     window.wm_iconphoto(True, evo_icon)
                     print("Successfully set EVO logo via wm_iconphoto")
+                    success = True
                 except Exception as e2:
-                    print(f"wm_iconphoto also failed: {e2}")
+                    print(f"wm_iconphoto failed: {e2}")
+            
+            # Method 4: Try setting default icon for all windows
+            try:
+                window.iconphoto(False, evo_icon)  # Set as default for all windows
+                print("Set EVO logo as default icon for all windows")
+            except Exception as e3:
+                print(f"Setting default icon failed: {e3}")
+                
+            if not success:
+                print("All icon setting methods failed")
         else:
             print("No EVO icon could be loaded")
     except Exception as e:
