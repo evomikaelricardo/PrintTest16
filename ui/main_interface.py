@@ -181,7 +181,7 @@ def main(initial_po_numbers=None):
             items = fetch_items(po_num, warehouse_id)
             
             if not items:
-                messagebox.showwarning("No Items", f"No items available for {po_num}")
+                messagebox.showwarning("No Items Found", f"We could not locate any item for {po_num}")
                 return  # Stay on current window
             
             # Only proceed if items exist - pass the fetched items

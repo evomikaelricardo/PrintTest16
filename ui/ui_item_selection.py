@@ -49,7 +49,7 @@ def second_interface(root, po_number, warehouse_id, initial_items=None):
     # Use pre-fetched items if available, otherwise fetch them
     items = initial_items if initial_items is not None else fetch_items(po_number, warehouse_id)
     if not items:
-        messagebox.showwarning("No Items", "No items available for this PO.")
+        messagebox.showwarning("No Items Found", "We could not locate any item for this PO.")
         main()
         return
 
