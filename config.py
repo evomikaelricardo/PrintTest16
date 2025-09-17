@@ -438,7 +438,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
             padx=8,
             pady=4,
             cursor="hand2",
-            activebackground=PRIMARY_HOVER,
+            activebackground="#87CEEB",  # Light blue hover color
             activeforeground="white"
         )
         menu_button.pack(side="right", padx=5)
@@ -455,7 +455,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         padx=8,
         pady=4,
         cursor="hand2",
-        activebackground=PRIMARY_HOVER,
+        activebackground="#87CEEB",  # Light blue hover color
         activeforeground="white",
         command=minimize_window
     )
