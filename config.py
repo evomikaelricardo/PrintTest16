@@ -231,6 +231,26 @@ def get_icon_image():
         logging.warning(f"Could not load application icon: {e}")
         return None
 
+def get_evo_logo_icon():
+    """Load the EVO logo for window icon"""
+    try:
+        # Load the uploaded EVO logo
+        image_path = "attached_assets/EVOlogo32x32_1758091850863.png"
+        image = Image.open(image_path)
+        
+        # Resize to 32x32 if necessary (though it should already be the right size)
+        if image.size != (32, 32):
+            image = image.resize((32, 32), Image.Resampling.LANCZOS)
+        
+        # Ensure the image is in a format compatible with Tkinter
+        if image.mode not in ('RGB', 'RGBA', 'L'):
+            image = image.convert('RGBA')
+        
+        return ImageTk.PhotoImage(image)
+    except Exception as e:
+        logging.warning(f"Could not load EVO logo icon: {e}")
+        return None
+
 # Function to create custom title bar
 def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     """
@@ -252,7 +272,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     if icon_image:
         icon_label = tk.Label(title_bar, bg=bg_color, image=icon_image)
         # Store the image reference in the label to prevent garbage collection
-        icon_label._image_ref = icon_image
+        setattr(icon_label, 'image', icon_image)
         icon_label.pack(side="left", padx=5)
 
     # Title Label
@@ -314,6 +334,14 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     def minimize_window():
         """Minimize the window - Windows 11 compatible"""
         try:
+            # Load and set the EVO logo as window icon before minimizing
+            evo_icon = get_evo_logo_icon()
+            if evo_icon:
+                try:
+                    window.iconphoto(True, evo_icon)
+                except Exception as icon_e:
+                    logging.warning(f"Could not set EVO logo as window icon: {icon_e}")
+            
             # Step 1: Temporarily disable overrideredirect to allow window manager control
             window.overrideredirect(False)
             # Step 2: Update to ensure changes take effect
