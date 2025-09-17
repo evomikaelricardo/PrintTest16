@@ -296,7 +296,45 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         icon_label.bind("<ButtonRelease-1>", stop_move)
         icon_label.bind("<B1-Motion>", on_motion)
 
-    # Menu Button (integrated into title bar)
+    # Window control functions
+    def close_window():
+        """Close window with confirmation"""
+        import tkinter as tk
+        from tkinter import messagebox
+        if messagebox.askyesno("Exit Application", "Are you sure you want to close this window?"):
+            # Handle different window types appropriately
+            if isinstance(window, tk.Tk):
+                # Main window - quit the entire application
+                window.quit()
+                window.destroy()
+            else:
+                # Child window - just destroy this window
+                window.destroy()
+    
+    def minimize_window():
+        """Minimize the window"""
+        window.iconify()
+
+    # Close Button (X) - rightmost
+    close_button = tk.Button(
+        title_bar,
+        text="✕",  # Close icon
+        font=("Arial", 12, "bold"),
+        bg=bg_color,
+        fg="white",
+        bd=0,
+        relief='flat',
+        padx=8,
+        pady=4,
+        cursor="hand2",
+        activebackground="#D13438",  # Red hover color
+        activeforeground="white",
+        command=close_window
+    )
+    close_button.pack(side="right", padx=(0, 5))
+
+    # Menu Button (integrated into title bar) - middle right
+    menu_button = None
     if show_menu:
         menu_button = tk.Button(
             title_bar,
@@ -312,10 +350,30 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
             activebackground=PRIMARY_HOVER,
             activeforeground="white"
         )
-        menu_button.pack(side="right", padx=10)
-        return title_bar, menu_button
+        menu_button.pack(side="right", padx=5)
+
+    # Minimize Button (_) - left of menu/close buttons
+    minimize_button = tk.Button(
+        title_bar,
+        text="−",  # Minimize icon
+        font=("Arial", 14, "bold"),
+        bg=bg_color,
+        fg="white",
+        bd=0,
+        relief='flat',
+        padx=8,
+        pady=4,
+        cursor="hand2",
+        activebackground=PRIMARY_HOVER,
+        activeforeground="white",
+        command=minimize_window
+    )
+    minimize_button.pack(side="right", padx=5)
     
-    return title_bar
+    if show_menu:
+        return title_bar, menu_button
+    else:
+        return title_bar
 
 # Default Function to center align the window of the UI
 def center_window(window, width, height, title=None, show_menu=False):
