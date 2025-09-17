@@ -248,6 +248,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
 
     # Add App Icon (if available)
     icon_image = get_icon_image()
+    icon_label = None
     if icon_image:
         icon_label = tk.Label(title_bar, bg=bg_color, image=icon_image)
         # Store the image reference in the label to prevent garbage collection
@@ -258,25 +259,6 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     title_label = tk.Label(title_bar, text=title, bg=bg_color, fg="white", font=("Arial", 12, "bold"))
     title_label.pack(side="left", padx=10)
 
-    # Menu Button (integrated into title bar)
-    if show_menu:
-        menu_button = tk.Button(
-            title_bar,
-            text="☰",  # Hamburger menu icon
-            font=("Arial", 14),
-            bg=bg_color,
-            fg="white",
-            bd=0,
-            relief='flat',
-            padx=8,
-            pady=4,
-            cursor="hand2",
-            activebackground=PRIMARY_HOVER,
-            activeforeground="white"
-        )
-        menu_button.pack(side="right", padx=10)
-        return title_bar, menu_button
-    
     # Variables to store drag offset (use a dictionary to avoid conflicts)
     drag_data = {"offset_x": 0, "offset_y": 0, "dragging": False}
 
@@ -298,16 +280,47 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
             y = event.y_root - drag_data["offset_y"]
             window.geometry(f"+{x}+{y}")
     
+    # Apply drag bindings to title bar and its child elements for better UX
     title_bar.bind("<Button-1>", start_move)
     title_bar.bind("<ButtonRelease-1>", stop_move)
     title_bar.bind("<B1-Motion>", on_motion)
+    
+    # Also bind to title label for dragging
+    title_label.bind("<Button-1>", start_move)
+    title_label.bind("<ButtonRelease-1>", stop_move)
+    title_label.bind("<B1-Motion>", on_motion)
+    
+    # Bind to icon label if it exists
+    if icon_label:
+        icon_label.bind("<Button-1>", start_move)
+        icon_label.bind("<ButtonRelease-1>", stop_move)
+        icon_label.bind("<B1-Motion>", on_motion)
+
+    # Menu Button (integrated into title bar)
+    if show_menu:
+        menu_button = tk.Button(
+            title_bar,
+            text="☰",  # Hamburger menu icon
+            font=("Arial", 14),
+            bg=bg_color,
+            fg="white",
+            bd=0,
+            relief='flat',
+            padx=8,
+            pady=4,
+            cursor="hand2",
+            activebackground=PRIMARY_HOVER,
+            activeforeground="white"
+        )
+        menu_button.pack(side="right", padx=10)
+        return title_bar, menu_button
     
     return title_bar
 
 # Default Function to center align the window of the UI
 def center_window(window, width, height, title=None, show_menu=False):
     """
-    Centers a Tkinter window on the screen.
+    Centers a Tkinter window on the screen and allows free movement.
 
     Args:
         window (Tk or Toplevel): The window to center.
@@ -316,14 +329,14 @@ def center_window(window, width, height, title=None, show_menu=False):
         title (str, optional): The title of the custom window. If None, skips custom styling.
         show_menu (bool): Whether to show the integrated menu button in the title bar.
     """
-    window.resizable(False, False)  # Locks the window geometry
+    window.resizable(True, True)  # Allow window resizing
 
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     x_cordinate = int((screen_width / 2) - (width / 2))
     y_cordinate = int((screen_height / 2) - (height / 2))
     window.geometry(f"{width}x{height}+{x_cordinate}+{y_cordinate}")
-    window.wm_attributes("-topmost", True)  # Make sure window is always on top
+    # Removed topmost attribute to allow normal window behavior
 
     if title is not None:
         window.configure(bg='white')  # Change the background color using configure
