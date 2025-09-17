@@ -312,8 +312,29 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
                 window.destroy()
     
     def minimize_window():
-        """Minimize the window"""
-        window.iconify()
+        """Minimize the window - Windows 11 compatible"""
+        try:
+            # Step 1: Temporarily disable overrideredirect to allow window manager control
+            window.overrideredirect(False)
+            # Step 2: Update to ensure changes take effect
+            window.update_idletasks()
+            # Step 3: Minimize to taskbar
+            window.state('iconic')
+        except Exception as e:
+            print(f"Minimize error: {e}")
+    
+    def restore_window(event=None):
+        """Restore window from minimized state"""
+        try:
+            # Only re-apply custom title bar if window is in normal state
+            if window.state() == 'normal':
+                # Add small delay to prevent flicker and focus issues
+                window.after(10, lambda: window.overrideredirect(True))
+        except Exception as e:
+            print(f"Restore error: {e}")
+    
+    # Bind the restore event to handle window restoration from taskbar
+    window.bind("<Map>", restore_window)
 
     # Close Button (X) - rightmost
     close_button = tk.Button(
