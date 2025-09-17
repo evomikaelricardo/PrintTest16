@@ -234,20 +234,33 @@ def get_icon_image():
 def get_evo_logo_icon():
     """Load the EVO logo for window icon"""
     try:
-        # Load the uploaded EVO logo
-        image_path = "attached_assets/EVOlogo32x32_1758091850863.png"
+        import os
+        # Load the uploaded EVO logo with absolute path
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "attached_assets", "EVOlogo32x32_1758091850863.png")
+        
+        print(f"Loading EVO logo from: {image_path}")
+        if not os.path.exists(image_path):
+            print(f"EVO logo file does not exist at: {image_path}")
+            return None
+            
         image = Image.open(image_path)
+        print(f"Original image size: {image.size}, mode: {image.mode}")
         
-        # Resize to 32x32 if necessary (though it should already be the right size)
-        if image.size != (32, 32):
-            image = image.resize((32, 32), Image.Resampling.LANCZOS)
-        
-        # Ensure the image is in a format compatible with Tkinter
-        if image.mode not in ('RGB', 'RGBA', 'L'):
+        # Convert to RGBA first for better compatibility
+        if image.mode != 'RGBA':
             image = image.convert('RGBA')
         
-        return ImageTk.PhotoImage(image)
+        # Resize to 32x32 if necessary 
+        if image.size != (32, 32):
+            image = image.resize((32, 32), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+            print(f"Resized image to: {image.size}")
+        
+        photo = ImageTk.PhotoImage(image)
+        print("Successfully created PhotoImage for EVO logo")
+        return photo
     except Exception as e:
+        print(f"Error loading EVO logo icon: {e}")
         logging.warning(f"Could not load EVO logo icon: {e}")
         return None
 
@@ -335,12 +348,30 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
         """Minimize the window - Windows 11 compatible"""
         try:
             # Load and set the EVO logo as window icon before minimizing
-            evo_icon = get_evo_logo_icon()
+            print("Minimize button clicked - setting EVO logo as window icon")
+            
+            # Cache the icon if not already cached
+            if not hasattr(window, '_evo_icon_cached'):
+                window._evo_icon_cached = get_evo_logo_icon()
+            
+            evo_icon = window._evo_icon_cached
             if evo_icon:
                 try:
+                    print("Setting EVO logo via iconphoto...")
                     window.iconphoto(True, evo_icon)
+                    
+                    # Also try wm_iconphoto as a fallback
+                    try:
+                        window.wm_iconphoto(True, evo_icon)
+                        print("Successfully set icon via wm_iconphoto")
+                    except Exception as wm_e:
+                        print(f"wm_iconphoto failed: {wm_e}")
+                        
                 except Exception as icon_e:
+                    print(f"Could not set EVO logo as window icon: {icon_e}")
                     logging.warning(f"Could not set EVO logo as window icon: {icon_e}")
+            else:
+                print("No EVO icon loaded - skipping icon setting")
             
             # Step 1: Temporarily disable overrideredirect to allow window manager control
             window.overrideredirect(False)
@@ -348,6 +379,7 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
             window.update_idletasks()
             # Step 3: Minimize to taskbar
             window.state('iconic')
+            print("Window minimized")
         except Exception as e:
             print(f"Minimize error: {e}")
     
@@ -424,6 +456,32 @@ def add_custom_title_bar(window, title, bg_color="#005A9F", show_menu=False):
     else:
         return title_bar
 
+def set_window_evo_icon(window):
+    """Set the EVO logo as the window icon"""
+    try:
+        print("Setting EVO logo as window icon...")
+        # Cache the icon if not already cached
+        if not hasattr(window, '_evo_icon_cached'):
+            window._evo_icon_cached = get_evo_logo_icon()
+        
+        evo_icon = window._evo_icon_cached
+        if evo_icon:
+            try:
+                # Try multiple methods to set the icon
+                window.iconphoto(True, evo_icon)
+                print("Successfully set EVO logo via iconphoto")
+            except Exception as e:
+                print(f"iconphoto failed: {e}")
+                try:
+                    window.wm_iconphoto(True, evo_icon)
+                    print("Successfully set EVO logo via wm_iconphoto")
+                except Exception as e2:
+                    print(f"wm_iconphoto also failed: {e2}")
+        else:
+            print("No EVO icon could be loaded")
+    except Exception as e:
+        print(f"Error setting window EVO icon: {e}")
+
 # Default Function to center align the window of the UI
 def center_window(window, width, height, title=None, show_menu=False):
     """
@@ -444,6 +502,9 @@ def center_window(window, width, height, title=None, show_menu=False):
     y_cordinate = int((screen_height / 2) - (height / 2))
     window.geometry(f"{width}x{height}+{x_cordinate}+{y_cordinate}")
     # Removed topmost attribute to allow normal window behavior
+
+    # Set the EVO logo as window icon for all windows
+    set_window_evo_icon(window)
 
     if title is not None:
         window.configure(bg='white')  # Change the background color using configure
