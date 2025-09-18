@@ -278,8 +278,14 @@ def second_interface(root, po_number, warehouse_id, initial_items=None):
             logging.info(success_msg)
             logging.info(f"Successful Tags: {successful_tags}")
 
-            # Show success message
-            messagebox.showinfo("Success", success_msg)
+            # Schedule success message and navigation on the main thread for thread-safety
+            def _success_and_return():
+                messagebox.showinfo("Success", success_msg)
+                next_window.destroy()
+                from ui.main_interface import main
+                main()
+            
+            next_window.after(0, _success_and_return)
 
         # Create a progress bar window
         progress_window = Toplevel(next_window)
