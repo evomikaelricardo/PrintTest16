@@ -57,7 +57,8 @@ def fetch_po_number():
     if data and data.get("status_code") == 200 and "data" in data:
         # Transform API output to match the desired format
         po_numbers = [(po["purchase_order_number"],) for po in data["data"]]
-        return sorted(po_numbers, key=lambda x: x[0], reverse=True)  # # Sort the tuples descendingly by the po_number
+        # return sorted(po_numbers, key=lambda x: x[0], reverse=True)  # # Sort the tuples descendingly by the po_number
+        return po_numbers
     else:
         return []
     
